@@ -1,0 +1,112 @@
+import { Trip } from '../models/trip.model';
+
+export const INITIAL_TRIPS: Trip[] = [
+  {
+    id: 'goa-sun-and-sand',
+    name: 'Goa Escape',
+    destination: 'Goa',
+    country: 'India',
+    startDate: '2026-10-05',
+    endDate: '2026-10-08',
+    travelers: {
+      adults: 2,
+      children: 0
+    },
+    status: 'Planned',
+    budget: 30000,
+    spent: 18999,
+    coverImage: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
+    preferences: ['Beach', 'Food', 'Relaxation', 'Culture'],
+    destinationsList: ['Calangute', 'Fontainhas', 'Benaulim'],
+    notes: 'Goa Escape • 03 Days • Beach cabanas reserved, Old Goa cathedral walk arranged.',
+    createdAt: '2026-09-01T10:00:00.000Z',
+    userId: 'usr-1',
+    userName: 'Labdhi',
+    travelStyle: 'Relaxing',
+    hotelName: 'Taj Exotica Resort & Spa',
+    activities: ['Beach Visit', 'Old Goa Heritage Walk', 'Sunset Cruise'],
+    progress: 65,
+    duration: '03 Days'
+  },
+  {
+    id: 'dubai-skyline-and-desert',
+    name: 'Dubai Explorer',
+    destination: 'Dubai',
+    country: 'United Arab Emirates',
+    startDate: '2026-11-12',
+    endDate: '2026-11-18',
+    travelers: {
+      adults: 2,
+      children: 1
+    },
+    status: 'Upcoming',
+    budget: 75000,
+    spent: 42000,
+    coverImage: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80',
+    preferences: ['Luxury', 'Architecture', 'Adventure'],
+    destinationsList: ['Downtown Dubai', 'Palm Jumeirah', 'Arabian Desert'],
+    notes: 'Sunset desert dunes dinner and Burj Khalifa lounge tickets confirmed.',
+    createdAt: '2026-08-15T14:30:00.000Z',
+    userId: 'usr-1',
+    userName: 'Labdhi',
+    travelStyle: 'Luxury',
+    hotelName: 'Atlantis The Royal',
+    activities: ['Desert Safari', 'Burj Khalifa Sky Deck', 'Dubai Marina Cruise'],
+    progress: 40,
+    duration: '06 Days'
+  },
+  {
+    id: 'rajasthan-royal-heritage',
+    name: 'Rajasthan Heritage',
+    destination: 'Rajasthan',
+    country: 'India',
+    startDate: '2026-12-02',
+    endDate: '2026-12-09',
+    travelers: {
+      adults: 2,
+      children: 0
+    },
+    status: 'Upcoming',
+    budget: 55000,
+    spent: 28000,
+    coverImage: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80',
+    preferences: ['Culture', 'Palaces', 'Photography', 'Food'],
+    destinationsList: ['Jaipur', 'Udaipur', 'Jodhpur'],
+    notes: 'Private heritage haveli stay and sunrise hot air balloon over Amber Fort.',
+    createdAt: '2026-07-20T11:15:00.000Z',
+    userId: 'usr-1',
+    userName: 'Labdhi',
+    travelStyle: 'Culture',
+    hotelName: 'Taj Lake Palace, Udaipur',
+    activities: ['City Palace Tour', 'Amber Fort Elephant Ride', 'Lake Pichola Boat Ride'],
+    progress: 80,
+    duration: '07 Days'
+  },
+  {
+    id: 'bali-tropical-paradise',
+    name: 'Bali Adventure',
+    destination: 'Bali',
+    country: 'Indonesia',
+    startDate: '2027-01-15',
+    endDate: '2027-01-22',
+    travelers: {
+      adults: 2,
+      children: 0
+    },
+    status: 'Planned',
+    budget: 68000,
+    spent: 22000,
+    coverImage: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80',
+    preferences: ['Nature', 'Wellness', 'Spiritual', 'Beaches'],
+    destinationsList: ['Ubud', 'Seminyak', 'Uluwatu'],
+    notes: 'Private infinity pool villa, holistic sound healing sessions in Ubud jungle.',
+    createdAt: '2026-09-10T09:00:00.000Z',
+    userId: 'usr-2',
+    userName: 'Sophia Montgomery',
+    travelStyle: 'Relaxing',
+    hotelName: 'Kamandalu Ubud',
+    activities: ['Tegallalang Rice Walk', 'Uluwatu Kecak Dance', 'Nusa Penida Boat Tour'],
+    progress: 30,
+    duration: '07 Days'
+  }
+];
