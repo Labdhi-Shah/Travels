@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { LucideIconComponent } from '../../shared/icon/lucide-icon.component';
 import { BookingService } from '../../core/services/booking.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -26,7 +27,7 @@ interface FlightItem {
 @Component({
   selector: 'app-flights',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideIconComponent],
+  imports: [CommonModule, FormsModule, RouterLink, LucideIconComponent],
   template: `
     <div class="min-h-screen bg-[#F8FAFC] pb-24 text-[#0F1E26] selection:bg-[#D4A359] selection:text-[#071F22]">
       
@@ -198,13 +199,21 @@ interface FlightItem {
             <p class="text-xs sm:text-sm text-slate-500">
               Your flight ticket for <span class="font-bold text-slate-800">{{ bookedFlight?.airline }} ({{ bookedFlight?.flightNumber }})</span> has been saved to your dashboard bookings.
             </p>
-            <button
-              type="button"
-              (click)="bookingSuccess = false"
-              class="w-full py-3 rounded-full bg-[#0C3B3E] text-white font-bold text-sm shadow-md cursor-pointer hover:bg-[#072527]"
-            >
-              Done
-            </button>
+            <div class="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                (click)="bookingSuccess = false"
+                class="flex-1 py-3 rounded-full border border-slate-200 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50 cursor-pointer"
+              >
+                Close
+              </button>
+              <a
+                routerLink="/bookings"
+                class="flex-1 py-3 rounded-full bg-[#0C3B3E] hover:bg-[#D4A359] hover:text-[#0C3B3E] text-white font-bold text-xs sm:text-sm shadow-md cursor-pointer transition-all flex items-center justify-center"
+              >
+                View Bookings
+              </a>
+            </div>
           </div>
         </div>
       }

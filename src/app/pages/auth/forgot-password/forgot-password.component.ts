@@ -66,6 +66,9 @@ import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component'
                   class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-[#D4A359] focus:ring-1 focus:ring-[#D4A359]"
                 />
               </div>
+              @if (forgotForm.get('email')?.invalid && (forgotForm.get('email')?.touched || forgotForm.get('email')?.dirty)) {
+                <p class="text-[11px] text-rose-500 font-medium">Please enter a valid email address.</p>
+              }
             </div>
 
             <button

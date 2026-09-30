@@ -105,20 +105,22 @@ interface NavItem {
       <!-- User Card & Exit -->
       <div class="p-3 border-t border-white/10">
         <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-white/5 border border-white/5">
-          <img
-            [src]="authService.currentUser()?.avatar"
-            [alt]="authService.currentUser()?.fullName"
-            class="w-9 h-9 rounded-full object-cover shrink-0 ring-2 ring-[#D4A359]/40"
-          />
+          <a routerLink="/profile" (click)="closeMobile.emit()" class="shrink-0 cursor-pointer block" title="View Profile">
+            <img
+              [src]="authService.currentUser()?.avatar"
+              [alt]="authService.currentUser()?.fullName"
+              class="w-9 h-9 rounded-full object-cover ring-2 ring-[#D4A359]/40 hover:scale-105 transition-transform"
+            />
+          </a>
           @if (!isCollapsed) {
-            <div class="flex-1 min-w-0">
+            <a routerLink="/profile" (click)="closeMobile.emit()" class="flex-1 min-w-0 cursor-pointer hover:opacity-90 block">
               <p class="text-xs font-bold text-white truncate">
                 {{ authService.currentUser()?.fullName }}
               </p>
               <p class="text-[10px] text-white/50 truncate">
                 {{ authService.currentUser()?.email }}
               </p>
-            </div>
+            </a>
             <button
               type="button"
               (click)="authService.logout()"
@@ -126,6 +128,15 @@ interface NavItem {
               title="Sign Out"
             >
               <app-icon name="log-out" [size]="16"></app-icon>
+            </button>
+          } @else {
+            <button
+              type="button"
+              (click)="authService.logout()"
+              class="text-white/60 hover:text-[#D4A359] p-1 transition-colors cursor-pointer"
+              title="Sign Out"
+            >
+              <app-icon name="log-out" [size]="15"></app-icon>
             </button>
           }
         </div>

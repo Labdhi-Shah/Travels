@@ -16,23 +16,40 @@ import { FavoriteService } from '../../core/services/favorite.service';
       <!-- Image with Duration & Travelers Badges & Wishlist -->
       <div class="relative p-3 pb-0">
         <div class="relative h-56 rounded-2xl overflow-hidden bg-slate-100">
-          <img
-            [src]="pkg.image"
-            [alt]="pkg.name"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-            loading="lazy"
-          />
+          <a [routerLink]="['/packages', pkg.id]" class="block w-full h-full cursor-pointer">
+            <img
+              [src]="pkg.image"
+              [alt]="pkg.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              loading="lazy"
+            />
+          </a>
 
           <!-- Duration Badge (Top Left) -->
-          <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold">
+          <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold pointer-events-none">
             {{ pkg.durationDays }} Days
           </span>
 
           <!-- Travelers Badge (Top Right) -->
-          <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1">
+          <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1 pointer-events-none">
             <app-icon name="users" [size]="12"></app-icon>
             <span>{{ pkg.maxTravelers }} Travelers</span>
           </span>
+
+          <!-- Wishlist Button (Bottom Right) -->
+          <button
+            type="button"
+            (click)="toggleFav($event)"
+            class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-red-500 backdrop-blur-md flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer z-10"
+            [attr.aria-label]="isFavorite ? 'Remove from favorites' : 'Add to favorites'"
+          >
+            <app-icon
+              name="heart"
+              [size]="14"
+              [isFilled]="isFavorite"
+              [extraClass]="isFavorite ? 'text-red-500' : 'text-slate-600'"
+            ></app-icon>
+          </button>
         </div>
       </div>
 
@@ -46,9 +63,11 @@ import { FavoriteService } from '../../core/services/favorite.service';
           </div>
 
           <!-- Title -->
-          <h3 class="text-lg font-bold font-display text-[#0F1E26] group-hover:text-[#0C3B3E] transition-colors leading-tight line-clamp-1">
-            {{ pkg.name }}
-          </h3>
+          <a [routerLink]="['/packages', pkg.id]" class="block group-hover:text-[#0C3B3E] transition-colors cursor-pointer">
+            <h3 class="text-lg font-bold font-display text-[#0F1E26] leading-tight line-clamp-1">
+              {{ pkg.name }}
+            </h3>
+          </a>
 
           <!-- Description -->
           <p class="text-xs text-slate-500 font-normal leading-relaxed line-clamp-2">

@@ -185,6 +185,6 @@ export class ExperiencesComponent implements OnInit {
     });
 
     this.selectedActivity = null;
-    this.router.navigate(['/dashboard/bookings']);
+    this.router.navigate(['/bookings']);
   }
 }

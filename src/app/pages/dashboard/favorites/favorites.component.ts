@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
 import { EmptyStateComponent } from '../../../shared/empty-state/empty-state.component';
 import { FavoriteService, SavedPlaceItem } from '../../../core/services/favorite.service';
@@ -59,16 +59,18 @@ type FavTab = 'All' | 'Destinations' | 'Hotels' | 'Packages' | 'Experiences';
               <div>
                 <!-- Large Image Container -->
                 <div class="relative h-52 overflow-hidden bg-[#EFEDE7]">
-                  <img
-                    [src]="item.image"
-                    [alt]="item.name"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    loading="lazy"
-                  />
-                  <div class="absolute inset-0 bg-gradient-to-t from-[#071F22]/75 via-transparent to-transparent"></div>
+                  <a [routerLink]="getRoute(item)" class="block w-full h-full cursor-pointer">
+                    <img
+                      [src]="item.image"
+                      [alt]="item.name"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      loading="lazy"
+                    />
+                  </a>
+                  <div class="absolute inset-0 bg-gradient-to-t from-[#071F22]/75 via-transparent to-transparent pointer-events-none"></div>
 
                   <!-- Category Tag -->
-                  <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-md bg-black/70 text-[#D4A359] text-[10px] font-bold backdrop-blur-md">
+                  <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-md bg-black/70 text-[#D4A359] text-[10px] font-bold backdrop-blur-md pointer-events-none">
                     {{ item.category }}
                   </span>
 
@@ -76,7 +78,7 @@ type FavTab = 'All' | 'Destinations' | 'Hotels' | 'Packages' | 'Experiences';
                   <button
                     type="button"
                     (click)="removeFavorite(item.id)"
-                    class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-rose-500 flex items-center justify-center shadow-md active:scale-90 transition-transform cursor-pointer"
+                    class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-rose-500 flex items-center justify-center shadow-md active:scale-90 transition-transform cursor-pointer z-10"
                     title="Remove from favorites"
                     aria-label="Remove from favorites"
                   >
@@ -84,7 +86,7 @@ type FavTab = 'All' | 'Destinations' | 'Hotels' | 'Packages' | 'Experiences';
                   </button>
 
                   <!-- Rating on Image -->
-                  <div class="absolute bottom-3 left-3 flex items-center gap-1 text-xs font-bold text-white">
+                  <div class="absolute bottom-3 left-3 flex items-center gap-1 text-xs font-bold text-white pointer-events-none">
                     <app-icon name="star" [size]="12" [isFilled]="true" extraClass="text-[#D4A359]"></app-icon>
                     <span>{{ item.rating }}</span>
                   </div>
@@ -92,9 +94,11 @@ type FavTab = 'All' | 'Destinations' | 'Hotels' | 'Packages' | 'Experiences';
 
                 <!-- Info: Name & Location -->
                 <div class="p-5">
-                  <h3 class="text-base font-bold text-[#071F22] font-display line-clamp-1 group-hover:text-[#D4A359] transition-colors">
-                    {{ item.name }}
-                  </h3>
+                  <a [routerLink]="getRoute(item)" class="block group-hover:text-[#D4A359] transition-colors cursor-pointer">
+                    <h3 class="text-base font-bold text-[#071F22] font-display line-clamp-1">
+                      {{ item.name }}
+                    </h3>
+                  </a>
                   <p class="text-xs text-[#6B7280] mt-1 flex items-center gap-1 line-clamp-1">
                     <app-icon name="map-pin" [size]="12" extraClass="text-[#D4A359]"></app-icon>
                     <span>{{ item.location }}</span>
@@ -138,6 +142,7 @@ type FavTab = 'All' | 'Destinations' | 'Hotels' | 'Packages' | 'Experiences';
 })
 export class FavoritesComponent {
   private favoriteService = inject(FavoriteService);
+  private router = inject(Router);
 
   tabs: FavTab[] = ['All', 'Destinations', 'Hotels', 'Packages', 'Experiences'];
   activeTab: FavTab = 'All';
@@ -172,6 +177,6 @@ export class FavoritesComponent {
   }
 
   explorePopular() {
-    window.location.href = '/destinations';
+    this.router.navigate(['/destinations']);
   }
 }

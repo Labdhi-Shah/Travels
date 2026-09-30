@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
 import { ModalComponent } from '../../../shared/modal/modal.component';
@@ -18,6 +18,7 @@ import { Trip } from '../../../models/trip.model';
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     DragDropModule,
     LucideIconComponent,
     ModalComponent,
@@ -42,7 +43,16 @@ import { Trip } from '../../../models/trip.model';
           </p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center flex-wrap gap-3">
+          <!-- Back to Trip Details Button -->
+          <a
+            [routerLink]="selectedTripId ? ['/my-trips', selectedTripId] : ['/my-trips']"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs sm:text-sm font-semibold text-[#071F22] flex items-center gap-1.5 transition-all shadow-sm cursor-pointer shrink-0"
+          >
+            <app-icon name="arrow-left" [size]="15"></app-icon>
+            <span>Trip Details</span>
+          </a>
+
           <!-- Trip Selector Dropdown -->
           <select
             [(ngModel)]="selectedTripId"
@@ -360,14 +370,32 @@ export class ItineraryComponent implements OnInit {
 
   ngOnInit() {
     this.trips = this.tripService.getTrips();
+
+    const paramId = this.route.snapshot.paramMap.get('id');
+    const queryTripId = this.route.snapshot.queryParamMap.get('tripId');
+    const targetId = paramId || queryTripId;
+
+    if (targetId && this.trips.some(t => t.id === targetId)) {
+      this.selectedTripId = targetId;
+    } else if (this.trips.length > 0) {
+      this.selectedTripId = this.trips[0].id;
+    }
+    this.onTripChange();
+
     this.route.paramMap.subscribe(params => {
       const routeId = params.get('id');
-      if (routeId) {
+      if (routeId && routeId !== this.selectedTripId) {
         this.selectedTripId = routeId;
-      } else if (this.trips.length > 0) {
-        this.selectedTripId = this.trips[0].id;
+        this.onTripChange();
       }
-      this.onTripChange();
+    });
+
+    this.route.queryParamMap.subscribe(queryParams => {
+      const qId = queryParams.get('tripId');
+      if (qId && qId !== this.selectedTripId) {
+        this.selectedTripId = qId;
+        this.onTripChange();
+      }
     });
   }
 

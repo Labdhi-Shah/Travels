@@ -74,6 +74,13 @@ import { AuthService } from '../../../core/services/auth.service';
             </p>
           </div>
 
+          <!-- Error Alert -->
+          @if (errorMessage) {
+            <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold">
+              {{ errorMessage }}
+            </div>
+          }
+
           <!-- Form (First Name, Last Name, Email, Phone, Password, Confirm Password) -->
           <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
             
@@ -198,6 +205,8 @@ export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  errorMessage = '';
+
   registerForm: FormGroup = this.fb.group(
     {
       firstName: ['', Validators.required],
@@ -217,6 +226,7 @@ export class RegisterComponent {
   }
 
   onSubmit() {
+    this.errorMessage = '';
     if (this.registerForm.valid) {
       const { firstName, lastName, email, phone, password } = this.registerForm.value;
       const fullName = `${firstName} ${lastName}`.trim();
@@ -229,6 +239,8 @@ export class RegisterComponent {
 
       if (success) {
         this.router.navigate(['/dashboard']);
+      } else {
+        this.errorMessage = 'An account with this email address already exists. Please sign in instead.';
       }
     }
   }

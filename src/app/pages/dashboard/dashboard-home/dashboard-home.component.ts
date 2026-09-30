@@ -67,23 +67,28 @@ import { Trip } from '../../../models/trip.model';
             </div>
 
             <div>
-              <h1 class="text-3xl sm:text-5xl font-bold font-display text-white tracking-tight">
-                Goa Escape
-              </h1>
+              <a
+                [routerLink]="upcomingTrip ? ['/my-trips', upcomingTrip.id] : ['/my-trips']"
+                class="hover:text-[#D4A359] transition-colors block cursor-pointer"
+              >
+                <h1 class="text-3xl sm:text-5xl font-bold font-display text-white tracking-tight">
+                  {{ upcomingTrip?.name || 'Goa Escape' }}
+                </h1>
+              </a>
               <p class="text-xs sm:text-sm text-[#D4A359] font-medium mt-1">
-                India &bull; 03 Days Beach & Heritage Retreat
+                {{ upcomingTrip?.country || 'India' }} &bull; {{ upcomingTrip?.duration || '03 Days Beach & Heritage Retreat' }}
               </p>
             </div>
 
             <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-200">
               <span class="flex items-center gap-1.5">
                 <app-icon name="calendar" [size]="15" extraClass="text-[#D4A359]"></app-icon>
-                <span>05 Oct – 08 Oct 2026</span>
+                <span>{{ upcomingTrip?.startDate || '05 Oct' }} – {{ upcomingTrip?.endDate || '08 Oct 2026' }}</span>
               </span>
               <span>&bull;</span>
               <span class="flex items-center gap-1.5">
                 <app-icon name="user" [size]="15" extraClass="text-[#D4A359]"></app-icon>
-                <span>2 Travelers</span>
+                <span>{{ (upcomingTrip?.travelers?.adults || 2) + (upcomingTrip?.travelers?.children || 0) }} Travelers</span>
               </span>
               <span>&bull;</span>
               <span class="flex items-center gap-1.5 text-emerald-400 font-semibold">
@@ -96,10 +101,10 @@ import { Trip } from '../../../models/trip.model';
             <div class="max-w-md space-y-1.5 pt-1">
               <div class="flex justify-between text-xs text-white/80 font-medium">
                 <span>Trip Readiness</span>
-                <span class="font-bold text-[#D4A359]">65% Planned</span>
+                <span class="font-bold text-[#D4A359]">{{ upcomingTrip?.progress || 65 }}% Planned</span>
               </div>
               <div class="w-full h-2 bg-white/15 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-[#D4A359] to-[#E5A93C] rounded-full transition-all duration-700" style="width: 65%"></div>
+                <div class="h-full bg-gradient-to-r from-[#D4A359] to-[#E5A93C] rounded-full transition-all duration-700" [style.width.%]="upcomingTrip?.progress || 65"></div>
               </div>
             </div>
           </div>
@@ -130,9 +135,12 @@ import { Trip } from '../../../models/trip.model';
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         
         <!-- 1. Itinerary Progress -->
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between">
+        <a
+          routerLink="/itinerary"
+          class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer group block"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Itinerary Progress</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280] group-hover:text-[#0A2D30] transition-colors">Itinerary Progress</span>
             <div class="w-9 h-9 rounded-2xl bg-[#D4A359]/15 text-[#B88738] flex items-center justify-center">
               <app-icon name="activity" [size]="17"></app-icon>
             </div>
@@ -142,42 +150,51 @@ import { Trip } from '../../../models/trip.model';
             <div class="w-full h-1.5 bg-[#EFEDE7] rounded-full overflow-hidden mt-2.5">
               <div class="h-full bg-gradient-to-r from-[#0A2D30] to-[#D4A359] rounded-full" style="width: 65%"></div>
             </div>
-            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">4 Activities Scheduled</span>
+            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">4 Activities Scheduled &rarr;</span>
           </div>
-        </div>
+        </a>
 
         <!-- 2. Bookings -->
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between">
+        <a
+          routerLink="/bookings"
+          class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer group block"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Confirmed Bookings</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280] group-hover:text-[#0A2D30] transition-colors">Confirmed Bookings</span>
             <div class="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
               <app-icon name="check-circle" [size]="17"></app-icon>
             </div>
           </div>
           <div class="mt-4">
             <p class="text-2xl sm:text-3xl font-extrabold font-display text-[#071F22]">3</p>
-            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">Resort, Flight & Cruise Active</span>
+            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">Resort, Flight & Cruise &rarr;</span>
           </div>
-        </div>
+        </a>
 
         <!-- 3. Budget -->
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between">
+        <a
+          routerLink="/budget"
+          class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer group block"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Committed Budget</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280] group-hover:text-[#0A2D30] transition-colors">Committed Budget</span>
             <div class="w-9 h-9 rounded-2xl bg-[#0A2D30]/10 text-[#0A2D30] flex items-center justify-center">
               <app-icon name="dollar-sign" [size]="17"></app-icon>
             </div>
           </div>
           <div class="mt-4">
             <p class="text-2xl sm:text-3xl font-extrabold font-display text-[#071F22]">$3,450</p>
-            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">of $5,000 total allocated</span>
+            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">of $5,000 total allocated &rarr;</span>
           </div>
-        </div>
+        </a>
 
         <!-- 4. Saved Places -->
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between">
+        <a
+          routerLink="/favorites"
+          class="bg-white p-5 sm:p-6 rounded-3xl border border-[#EFEDE7] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-between cursor-pointer group block"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280]">Saved Bucket List</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#6B7280] group-hover:text-[#0A2D30] transition-colors">Saved Bucket List</span>
             <div class="w-9 h-9 rounded-2xl bg-[#D4A359]/15 text-[#B88738] flex items-center justify-center">
               <app-icon name="heart" [size]="17"></app-icon>
             </div>
@@ -186,9 +203,9 @@ import { Trip } from '../../../models/trip.model';
             <p class="text-2xl sm:text-3xl font-extrabold font-display text-[#071F22]">
               {{ favoriteService.favoriteCount() || 5 }}
             </p>
-            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">Curated Destinations</span>
+            <span class="text-[11px] text-[#6B7280] mt-1.5 block font-medium">Curated Destinations &rarr;</span>
           </div>
-        </div>
+        </a>
 
       </div>
 
@@ -249,59 +266,36 @@ import { Trip } from '../../../models/trip.model';
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <!-- Trip 1: Goa -->
-          <div class="p-4 rounded-2xl border border-[#EFEDE7] bg-[#F8F7F3]/40 hover:border-[#D4A359]/50 transition-all space-y-3 group">
-            <div class="relative h-32 rounded-xl overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" alt="Goa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-[#071F22]/80 backdrop-blur-sm text-white text-[10px] font-bold">
-                Planned &bull; 65%
-              </span>
-            </div>
-            <div>
-              <h4 class="text-base font-bold text-[#071F22]">Goa Escape</h4>
-              <p class="text-xs text-[#6B7280]">05 Oct – 08 Oct 2026 &bull; 2 Travelers</p>
-            </div>
-            <div class="pt-2 border-t border-[#EFEDE7] flex items-center justify-between text-xs">
-              <span class="font-bold text-[#071F22]">$3,450 spent</span>
-              <a routerLink="/my-trips" class="text-xs font-bold text-[#D4A359] hover:underline">Inspect &rarr;</a>
-            </div>
-          </div>
+          @for (trip of recentTrips; track trip.id) {
+            <div class="p-4 rounded-2xl border border-[#EFEDE7] bg-[#F8F7F3]/40 hover:border-[#D4A359]/50 transition-all space-y-3 group flex flex-col justify-between">
+              <div>
+                <a [routerLink]="['/my-trips', trip.id]" class="block relative h-36 rounded-xl overflow-hidden cursor-pointer">
+                  <img
+                    [src]="trip.coverImage"
+                    [alt]="trip.name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-[#071F22]/80 backdrop-blur-sm text-white text-[10px] font-bold">
+                    {{ trip.status }} &bull; {{ trip.progress }}%
+                  </span>
+                </a>
+                <div class="mt-3">
+                  <a [routerLink]="['/my-trips', trip.id]" class="hover:text-[#D4A359] transition-colors cursor-pointer">
+                    <h4 class="text-base font-bold text-[#071F22]">{{ trip.name }}</h4>
+                  </a>
+                  <p class="text-xs text-[#6B7280] mt-0.5">{{ trip.startDate }} &bull; {{ trip.destination }}</p>
+                </div>
+              </div>
 
-          <!-- Trip 2: Dubai -->
-          <div class="p-4 rounded-2xl border border-[#EFEDE7] bg-[#F8F7F3]/40 hover:border-[#D4A359]/50 transition-all space-y-3 group">
-            <div class="relative h-32 rounded-xl overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" alt="Dubai" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-[#071F22]/80 backdrop-blur-sm text-white text-[10px] font-bold">
-                Upcoming &bull; 40%
-              </span>
+              <div class="pt-2 border-t border-[#EFEDE7] flex items-center justify-between text-xs mt-2">
+                <span class="font-bold text-[#071F22]">\${{ trip.spent || trip.budget | number }} spent</span>
+                <a [routerLink]="['/my-trips', trip.id]" class="text-xs font-bold text-[#D4A359] hover:underline flex items-center gap-1 cursor-pointer">
+                  <span>Inspect</span>
+                  <span>&rarr;</span>
+                </a>
+              </div>
             </div>
-            <div>
-              <h4 class="text-base font-bold text-[#071F22]">Dubai Explorer</h4>
-              <p class="text-xs text-[#6B7280]">12 Nov – 18 Nov 2026 &bull; 3 Travelers</p>
-            </div>
-            <div class="pt-2 border-t border-[#EFEDE7] flex items-center justify-between text-xs">
-              <span class="font-bold text-[#071F22]">$4,200 spent</span>
-              <a routerLink="/my-trips" class="text-xs font-bold text-[#D4A359] hover:underline">Inspect &rarr;</a>
-            </div>
-          </div>
-
-          <!-- Trip 3: Rajasthan -->
-          <div class="p-4 rounded-2xl border border-[#EFEDE7] bg-[#F8F7F3]/40 hover:border-[#D4A359]/50 transition-all space-y-3 group">
-            <div class="relative h-32 rounded-xl overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=600&q=80" alt="Rajasthan" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-[#071F22]/80 backdrop-blur-sm text-white text-[10px] font-bold">
-                Completed
-              </span>
-            </div>
-            <div>
-              <h4 class="text-base font-bold text-[#071F22]">Rajasthan Heritage</h4>
-              <p class="text-xs text-[#6B7280]">Dec 2025 &bull; 2 Travelers</p>
-            </div>
-            <div class="pt-2 border-t border-[#EFEDE7] flex items-center justify-between text-xs">
-              <span class="font-bold text-[#071F22]">$2,900 spent</span>
-              <a routerLink="/my-trips" class="text-xs font-bold text-[#D4A359] hover:underline">Inspect &rarr;</a>
-            </div>
-          </div>
+          }
         </div>
       </div>
 
@@ -610,4 +604,12 @@ export class DashboardHomeComponent {
   bookingService = inject(BookingService);
   favoriteService = inject(FavoriteService);
   budgetService = inject(BudgetService);
+
+  get upcomingTrip(): Trip | undefined {
+    return this.tripService.trips()[0];
+  }
+
+  get recentTrips(): Trip[] {
+    return this.tripService.trips().slice(0, 3);
+  }
 }

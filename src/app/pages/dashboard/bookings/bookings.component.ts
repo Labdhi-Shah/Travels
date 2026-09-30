@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
 import { ModalComponent } from '../../../shared/modal/modal.component';
 import { EmptyStateComponent } from '../../../shared/empty-state/empty-state.component';
@@ -184,6 +185,7 @@ import { Booking, BookingCategory } from '../../../models/booking.model';
 })
 export class BookingsComponent {
   private bookingService = inject(BookingService);
+  private router = inject(Router);
 
   readonly categoryTabs = ['All', 'Flights', 'Hotels', 'Activities', 'Restaurants', 'Transportation'];
   selectedCategory = 'All';
@@ -209,6 +211,6 @@ export class BookingsComponent {
   }
 
   browseHotels(): void {
-    window.location.href = '/hotels';
+    this.router.navigate(['/hotels']);
   }
 }

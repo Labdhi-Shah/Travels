@@ -142,6 +142,12 @@ import { CommonModule } from '@angular/common';
         <polyline points="15 18 9 12 15 6"></polyline>
       </g>
 
+      <!-- Arrow Left -->
+      <g *ngSwitchCase="'arrow-left'">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </g>
+
       <!-- Check -->
       <g *ngSwitchCase="'check'">
         <polyline points="20 6 9 17 4 12"></polyline>

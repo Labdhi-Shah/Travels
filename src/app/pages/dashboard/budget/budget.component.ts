@@ -5,6 +5,7 @@ import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component'
 import { ModalComponent } from '../../../shared/modal/modal.component';
 import { BudgetService } from '../../../core/services/budget.service';
 import { TripService } from '../../../core/services/trip.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Expense, ExpenseCategory } from '../../../models/expense.model';
 import { Trip } from '../../../models/trip.model';
 
@@ -315,6 +316,7 @@ interface CategoryVisual {
 export class BudgetComponent implements OnInit {
   private budgetService = inject(BudgetService);
   private tripService = inject(TripService);
+  private toastService = inject(ToastService);
 
   trips: Trip[] = [];
   selectedTripId = '';
@@ -434,10 +436,12 @@ export class BudgetComponent implements OnInit {
       paymentMethod: 'Credit Card'
     });
 
+    this.toastService.show('Expense recorded successfully!', 'success');
     this.isModalOpen = false;
   }
 
   deleteExpense(id: string) {
     this.budgetService.deleteExpense(id);
+    this.toastService.show('Expense deleted', 'info');
   }
 }

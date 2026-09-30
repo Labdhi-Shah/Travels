@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { FavoriteService } from '../../../core/services/favorite.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 type ProfileSection = 'info' | 'personal' | 'preferences' | 'saved' | 'settings';
 
@@ -322,6 +323,7 @@ type ProfileSection = 'info' | 'personal' | 'preferences' | 'saved' | 'settings'
 export class ProfileComponent implements OnInit {
   authService = inject(AuthService);
   favoriteService = inject(FavoriteService);
+  private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
 
   isEditing = false;
@@ -372,6 +374,7 @@ export class ProfileComponent implements OnInit {
     if (this.profileForm.valid) {
       this.authService.updateProfile(this.profileForm.value);
       this.isEditing = false;
+      this.toastService.show('Profile updated successfully!', 'success');
     }
   }
 }

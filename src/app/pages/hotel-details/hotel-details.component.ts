@@ -503,5 +503,6 @@ export class HotelDetailsComponent implements OnInit {
     });
 
     this.toastService.success(`Reservation confirmed for ${this.hotel.name}! Added to your Bookings.`);
+    this.router.navigate(['/bookings']);
   }
 }

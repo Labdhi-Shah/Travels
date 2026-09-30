@@ -1,11 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
 import { TripService } from '../../../core/services/trip.service';
 import { BookingService } from '../../../core/services/booking.service';
 import { ItineraryService } from '../../../core/services/itinerary.service';
 import { BudgetService } from '../../../core/services/budget.service';
+import { FavoriteService } from '../../../core/services/favorite.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Trip } from '../../../models/trip.model';
 import { Booking } from '../../../models/booking.model';
 import { ItineraryItem } from '../../../models/itinerary.model';
@@ -30,10 +32,10 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
 
         <div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div class="space-y-3">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <a
                 routerLink="/my-trips"
-                class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold backdrop-blur-md transition-colors"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer"
               >
                 <app-icon name="arrow-left" [size]="12"></app-icon>
                 <span>Back to Trips</span>
@@ -41,6 +43,16 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
               <span class="px-3.5 py-1 rounded-full bg-emerald-600/90 text-white text-xs font-semibold uppercase tracking-wider">
                 {{ trip.status }}
               </span>
+              <button
+                type="button"
+                (click)="toggleFavorite()"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer"
+                [ngClass]="isFavorite() ? 'text-[#D4A359]' : 'text-white'"
+                title="Favorite Destination"
+              >
+                <app-icon name="heart" [size]="12" [isFilled]="isFavorite()"></app-icon>
+                <span>{{ isFavorite() ? 'Favorited' : 'Favorite' }}</span>
+              </button>
             </div>
 
             <h1 class="text-3xl sm:text-5xl font-serif font-bold text-white tracking-tight">{{ trip.name }}</h1>
@@ -64,20 +76,37 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
 
           <div class="flex flex-wrap gap-2.5 shrink-0">
             <a
+              routerLink="/plan-trip"
+              [queryParams]="{ destination: trip.destination }"
+              class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors backdrop-blur-sm cursor-pointer"
+            >
+              <app-icon name="edit" [size]="14"></app-icon>
+              <span>Edit Trip</span>
+            </a>
+            <a
               routerLink="/itinerary"
               [queryParams]="{ tripId: trip.id }"
               class="px-5 py-2.5 rounded-full bg-[#0084FF] hover:bg-[#0070D8] text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
             >
-              <app-icon name="plus" [size]="14"></app-icon>
-              <span>Add Event</span>
+              <app-icon name="calendar" [size]="14"></app-icon>
+              <span>View Itinerary</span>
             </a>
             <a
               routerLink="/budget"
-              class="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors backdrop-blur-sm cursor-pointer"
+              class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors backdrop-blur-sm cursor-pointer"
             >
               <app-icon name="dollar-sign" [size]="14"></app-icon>
               <span>Track Budget</span>
             </a>
+            <button
+              type="button"
+              (click)="deleteTrip()"
+              class="px-4 py-2.5 rounded-full bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Delete Trip"
+            >
+              <app-icon name="trash-2" [size]="14"></app-icon>
+              <span>Delete</span>
+            </button>
           </div>
         </div>
       </div>
@@ -216,8 +245,16 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
               </p>
             </div>
 
-            <div class="text-right shrink-0">
+            <div class="text-right shrink-0 flex items-center gap-2">
               <span class="text-sm font-serif font-bold text-[#071328]">\${{ item.estimatedCost }}</span>
+              <button
+                type="button"
+                (click)="deleteItineraryItem(item.id)"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                title="Delete Activity"
+              >
+                <app-icon name="trash-2" [size]="14"></app-icon>
+              </button>
             </div>
           </div>
         </div>
@@ -226,16 +263,25 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
       <!-- TAB 4: BUDGET -->
       <div *ngIf="activeTab === 'budget'" class="space-y-6 animate-fade-in">
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 class="text-xl font-serif font-bold text-[#071328]">Budget Health</h3>
               <p class="text-xs text-[#6B7280]">Committed expenses vs total journey limit.</p>
             </div>
-            <div class="text-right">
-              <span class="text-xs text-[#6B7280] uppercase tracking-wider">Total Spent / Remaining</span>
-              <p class="text-xl font-serif font-bold text-[#071328]">
-                \${{ trip.spent | number }} / \${{ (trip.budget - trip.spent) | number }}
-              </p>
+            <div class="flex items-center gap-4">
+              <a
+                routerLink="/budget"
+                class="px-4 py-2 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+              >
+                <app-icon name="plus" [size]="14"></app-icon>
+                <span>Add Expense</span>
+              </a>
+              <div class="text-right">
+                <span class="text-xs text-[#6B7280] uppercase tracking-wider">Total Spent / Remaining</span>
+                <p class="text-xl font-serif font-bold text-[#071328]">
+                  \${{ trip.spent | number }} / \${{ (trip.budget - trip.spent) | number }}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -341,6 +387,9 @@ export class TripDetailsComponent implements OnInit {
   private bookingService = inject(BookingService);
   private itineraryService = inject(ItineraryService);
   private budgetService = inject(BudgetService);
+  private favoriteService = inject(FavoriteService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
 
   Math = Math;
   trip: Trip | null = null;
@@ -360,6 +409,33 @@ export class TripDetailsComponent implements OnInit {
   bookings: Booking[] = [];
   itineraryItems: ItineraryItem[] = [];
   budgetBreakdown: BudgetCategorySummary[] = [];
+
+  isFavorite(): boolean {
+    return this.trip ? this.favoriteService.isFavorite(this.trip.id) : false;
+  }
+
+  toggleFavorite(): void {
+    if (!this.trip) return;
+    this.favoriteService.toggleFavorite(this.trip.id);
+    this.toastService.success(this.isFavorite() ? 'Trip destination saved to favorites' : 'Removed from favorites');
+  }
+
+  deleteTrip(): void {
+    if (!this.trip) return;
+    if (confirm(`Are you sure you want to delete "${this.trip.name}"?`)) {
+      this.tripService.deleteTrip(this.trip.id);
+      this.toastService.success('Trip deleted successfully');
+      this.router.navigate(['/my-trips']);
+    }
+  }
+
+  deleteItineraryItem(itemId: string): void {
+    this.itineraryService.deleteItem(itemId);
+    if (this.trip) {
+      this.itineraryItems = this.itineraryService.getItemsByTripId(this.trip.id);
+    }
+    this.toastService.success('Itinerary item removed');
+  }
 
   get tripCenterCoordinates(): { lat: number; lng: number } {
     if (!this.trip) return { lat: 35.6762, lng: 139.6503 };

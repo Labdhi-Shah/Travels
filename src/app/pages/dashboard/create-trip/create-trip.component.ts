@@ -7,6 +7,7 @@ import { TripService } from '../../../core/services/trip.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { DestinationService } from '../../../core/services/destination.service';
 import { HotelService } from '../../../core/services/hotel.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Destination } from '../../../models/destination.model';
 import { Hotel } from '../../../models/hotel.model';
 
@@ -186,7 +187,7 @@ interface StepInfo {
                   </div>
                 </div>
                 <span class="px-3 py-1 rounded-full bg-[#0A2D30] text-[#D4A359] font-bold text-xs">
-                  03 Nights &bull; 04 Days
+                  {{ getDurationText() }}
                 </span>
               </div>
             </div>
@@ -257,10 +258,36 @@ interface StepInfo {
                 </div>
               </div>
 
+              <!-- Rooms Required -->
+              <div class="flex items-center justify-between p-4 rounded-2xl bg-white border border-[#EFEDE7]">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-[#0A2D30]/10 text-[#0A2D30] flex items-center justify-center">
+                    <app-icon name="hotel" [size]="18"></app-icon>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-base text-[#071F22]">Rooms Required</h4>
+                    <p class="text-xs text-[#6B7280]">Private suites or hotel rooms</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button
+                    type="button"
+                    (click)="decrementRooms()"
+                    class="w-10 h-10 rounded-full bg-[#F8F7F3] border border-[#EFEDE7] flex items-center justify-center font-bold text-[#071F22] hover:bg-[#D4A359] hover:text-[#071F22] transition-colors cursor-pointer"
+                  >-</button>
+                  <span class="w-8 text-center font-bold text-lg text-[#071F22] font-display">{{ roomsCount }}</span>
+                  <button
+                    type="button"
+                    (click)="incrementRooms()"
+                    class="w-10 h-10 rounded-full bg-[#F8F7F3] border border-[#EFEDE7] flex items-center justify-center font-bold text-[#071F22] hover:bg-[#D4A359] hover:text-[#071F22] transition-colors cursor-pointer"
+                  >+</button>
+                </div>
+              </div>
+
               <!-- Summary pill -->
               <div class="text-center pt-2">
                 <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0A2D30] text-[#D4A359] text-xs font-bold">
-                  <span>Party: {{ adultsCount + kidsCount }} Travelers ({{ adultsCount }} Adults, {{ kidsCount }} Kids)</span>
+                  <span>Party: {{ adultsCount + kidsCount }} Travelers ({{ adultsCount }} Adults, {{ kidsCount }} Kids) &bull; {{ roomsCount }} {{ roomsCount === 1 ? 'Room' : 'Rooms' }}</span>
                 </span>
               </div>
             </div>
@@ -394,6 +421,38 @@ interface StepInfo {
                 </div>
               }
             </div>
+
+            <!-- Flight Selection Options -->
+            <div class="pt-6 border-t border-[#EFEDE7] space-y-3">
+              <div>
+                <h4 class="text-base font-bold text-[#071F22] font-display flex items-center gap-2">
+                  <app-icon name="plane" [size]="18" extraClass="text-[#D4A359]"></app-icon>
+                  <span>Flight Booking Preference</span>
+                </h4>
+                <p class="text-xs text-[#6B7280]">Select your preferred air travel cabin class to incorporate into your itinerary.</p>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                @for (flight of flightOptions; track flight.name) {
+                  <div
+                    (click)="selectedFlight = flight.name"
+                    class="p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between"
+                    [ngClass]="selectedFlight === flight.name
+                      ? 'border-[#D4A359] bg-[#F8F7F3] shadow-md ring-2 ring-[#D4A359]/30'
+                      : 'border-[#EFEDE7] hover:border-[#D4A359]/40 bg-white'"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-[#071F22]">{{ flight.name }}</span>
+                      @if (selectedFlight === flight.name) {
+                        <span class="w-4 h-4 rounded-full bg-[#D4A359] text-[#071F22] flex items-center justify-center text-[10px] font-bold">✓</span>
+                      }
+                    </div>
+                    <span class="text-[11px] text-[#6B7280] mt-1">{{ flight.desc }}</span>
+                    <span class="text-xs font-bold text-[#D4A359] mt-2 block">{{ flight.price }}</span>
+                  </div>
+                }
+              </div>
+            </div>
           </div>
         }
 
@@ -452,18 +511,18 @@ interface StepInfo {
                 <div>
                   <span class="text-[10px] font-bold uppercase tracking-widest text-[#D4A359]">{{ selectedDestination?.country }}</span>
                   <h3 class="text-2xl font-bold font-display text-[#071F22]">{{ selectedDestination?.name }} Escape</h3>
-                  <p class="text-xs text-[#6B7280] mt-0.5">{{ startDate }} &ndash; {{ endDate }} &bull; 04 Days</p>
+                  <p class="text-xs text-[#6B7280] mt-0.5">{{ startDate }} &ndash; {{ endDate }} &bull; {{ getDurationText() }}</p>
                 </div>
               </div>
 
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#EFEDE7] text-xs">
                 <div>
-                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Travelers</span>
-                  <span class="font-bold text-[#071F22] text-sm">{{ adultsCount }} Adults, {{ kidsCount }} Kids</span>
+                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Travelers & Rooms</span>
+                  <span class="font-bold text-[#071F22] text-sm">{{ adultsCount }} Adults, {{ kidsCount }} Kids &bull; {{ roomsCount }} {{ roomsCount === 1 ? 'Room' : 'Rooms' }}</span>
                 </div>
                 <div>
-                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Budget Tier</span>
-                  <span class="font-bold text-[#071F22] text-sm">{{ selectedBudget }}</span>
+                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Budget & Flight</span>
+                  <span class="font-bold text-[#071F22] text-sm">{{ selectedBudget }} &bull; {{ selectedFlight }}</span>
                 </div>
                 <div>
                   <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Travel Style</span>
@@ -487,47 +546,93 @@ interface StepInfo {
               </div>
             </div>
 
-            <!-- Create My Trip CTA -->
-            <div class="flex justify-center pt-2">
+            <!-- Action Buttons: Create Trip, Save Draft, Clear Form -->
+            <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
               <button
                 type="button"
                 (click)="createMyTrip()"
-                class="px-10 py-4 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white font-bold text-base flex items-center gap-3 shadow-xl hover:shadow-2xl transition-all active:scale-95 cursor-pointer"
+                class="px-8 py-3.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-xl hover:shadow-2xl transition-all active:scale-95 cursor-pointer"
               >
                 <span>Create My Trip</span>
                 <app-icon name="arrow-right" [size]="18"></app-icon>
+              </button>
+
+              <button
+                type="button"
+                (click)="saveTripDraft()"
+                class="px-6 py-3.5 rounded-full border-2 border-[#D4A359] hover:bg-[#D4A359]/20 text-[#071F22] font-bold text-sm flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95"
+              >
+                <app-icon name="bookmark" [size]="16" extraClass="text-[#B88738]"></app-icon>
+                <span>Save as Draft</span>
+              </button>
+
+              <button
+                type="button"
+                (click)="resetForm()"
+                class="px-5 py-3.5 rounded-full border border-slate-200 hover:bg-slate-100 text-[#6B7280] hover:text-rose-600 font-bold text-sm transition-all cursor-pointer"
+              >
+                Clear Form
               </button>
             </div>
           </div>
         }
 
         <!-- BOTTOM NAVIGATION CONTROLS -->
-        <div class="flex items-center justify-between pt-6 border-t border-[#EFEDE7] mt-8">
-          <button
-            type="button"
-            (click)="prevStep()"
-            [disabled]="currentStep === 1"
-            class="px-5 py-2.5 rounded-full border border-[#EFEDE7] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-            [ngClass]="currentStep === 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#EFEDE7] text-[#071F22]'"
-          >
-            <app-icon name="arrow-left" [size]="14"></app-icon>
-            <span>Previous</span>
-          </button>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-[#EFEDE7] mt-8">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="prevStep()"
+              [disabled]="currentStep === 1"
+              class="px-5 py-2.5 rounded-full border border-[#EFEDE7] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              [ngClass]="currentStep === 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#EFEDE7] text-[#071F22]'"
+            >
+              <app-icon name="arrow-left" [size]="14"></app-icon>
+              <span>Previous</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="resetForm()"
+              class="px-4 py-2.5 rounded-full border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-all cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
 
           <span class="text-xs font-bold text-[#6B7280]">
             Step {{ currentStep }} of 8
           </span>
 
-          @if (currentStep < 8) {
+          <div class="flex items-center gap-2">
             <button
               type="button"
-              (click)="nextStep()"
-              class="px-7 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+              (click)="saveTripDraft()"
+              class="px-5 py-2.5 rounded-full border border-[#D4A359] text-[#071F22] hover:bg-[#D4A359]/20 text-xs font-bold transition-all cursor-pointer shadow-sm"
             >
-              <span>Next Step</span>
-              <app-icon name="arrow-right" [size]="14"></app-icon>
+              Save as Draft
             </button>
-          }
+
+            @if (currentStep < 8) {
+              <button
+                type="button"
+                (click)="nextStep()"
+                class="px-7 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+              >
+                <span>Next Step</span>
+                <app-icon name="arrow-right" [size]="14"></app-icon>
+              </button>
+            } @else {
+              <button
+                type="button"
+                (click)="createMyTrip()"
+                class="px-7 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-md active:scale-95"
+              >
+                <span>Create My Trip</span>
+                <app-icon name="arrow-right" [size]="14"></app-icon>
+              </button>
+            }
+          </div>
         </div>
 
       </div>
@@ -540,6 +645,7 @@ export class CreateTripComponent implements OnInit {
   private authService = inject(AuthService);
   private destService = inject(DestinationService);
   private hotelService = inject(HotelService);
+  private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -552,7 +658,7 @@ export class CreateTripComponent implements OnInit {
     { num: 3, labelNum: '03', name: 'Travelers' },
     { num: 4, labelNum: '04', name: 'Budget' },
     { num: 5, labelNum: '05', name: 'Travel Style' },
-    { num: 6, labelNum: '06', name: 'Hotel' },
+    { num: 6, labelNum: '06', name: 'Hotel & Flight' },
     { num: 7, labelNum: '07', name: 'Activities' },
     { num: 8, labelNum: '08', name: 'Review' }
   ];
@@ -565,6 +671,7 @@ export class CreateTripComponent implements OnInit {
   endDate = '2026-10-08';
   adultsCount = 2;
   kidsCount = 0;
+  roomsCount = 1;
 
   budgetTiers = [
     { name: 'Budget', tag: 'Essential', description: 'Smart economical hostels, trains, and authentic street eats.', estAmount: 450 },
@@ -585,6 +692,14 @@ export class CreateTripComponent implements OnInit {
   selectedStyle = 'Relaxing';
 
   selectedHotel: Hotel | null = null;
+
+  flightOptions = [
+    { name: 'Self-Arranged', desc: 'No flights needed', price: '$0' },
+    { name: 'Economy', desc: 'Standard seating', price: '+$350/pp' },
+    { name: 'Premium Economy', desc: 'Extra legroom & priority', price: '+$680/pp' },
+    { name: 'Business Class', desc: 'Lie-flat & lounge', price: '+$1,450/pp' }
+  ];
+  selectedFlight = 'Economy';
 
   activityTypes = [
     { name: 'Beach', icon: 'sun' },
@@ -612,6 +727,23 @@ export class CreateTripComponent implements OnInit {
         );
         if (found) this.selectedDestination = found;
       }
+      if (params['startDate']) {
+        this.startDate = params['startDate'];
+      }
+      if (params['endDate']) {
+        this.endDate = params['endDate'];
+      }
+      if (params['adults']) {
+        const val = parseInt(params['adults'], 10);
+        if (!isNaN(val) && val > 0) this.adultsCount = val;
+      }
+      if (params['step']) {
+        const stepNum = parseInt(params['step'], 10);
+        if (!isNaN(stepNum) && stepNum >= 1 && stepNum <= 8) {
+          this.currentStep = stepNum;
+          this.maxVisitedStep = Math.max(this.maxVisitedStep, stepNum);
+        }
+      }
     });
   }
 
@@ -631,6 +763,40 @@ export class CreateTripComponent implements OnInit {
   decrementAdults() { if (this.adultsCount > 1) this.adultsCount--; }
   incrementKids() { this.kidsCount++; }
   decrementKids() { if (this.kidsCount > 0) this.kidsCount--; }
+  incrementRooms() { this.roomsCount++; }
+  decrementRooms() { if (this.roomsCount > 1) this.roomsCount--; }
+
+  getDurationText(): string {
+    if (!this.startDate || !this.endDate) return '03 Nights • 04 Days';
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
+    const diffTime = end.getTime() - start.getTime();
+    const diffDays = Math.max(1, Math.round(diffTime / (1000 * 60 * 60 * 24)));
+    const nights = Math.max(0, diffDays);
+    const days = nights + 1;
+    return `${nights < 10 ? '0' + nights : nights} Nights • ${days < 10 ? '0' + days : days} Days`;
+  }
+
+  resetForm() {
+    this.currentStep = 1;
+    this.maxVisitedStep = 1;
+    if (this.destinations().length > 0) {
+      this.selectedDestination = this.destinations()[0];
+    }
+    this.startDate = '2026-10-05';
+    this.endDate = '2026-10-08';
+    this.adultsCount = 2;
+    this.kidsCount = 0;
+    this.roomsCount = 1;
+    this.selectedBudget = 'Comfort';
+    this.selectedStyle = 'Relaxing';
+    this.selectedFlight = 'Economy';
+    if (this.hotels().length > 0) {
+      this.selectedHotel = this.hotels()[0];
+    }
+    this.selectedActivities = ['Beach', 'Sightseeing', 'Food'];
+    this.toastService.show('Form reset to default settings', 'info');
+  }
 
   nextStep() {
     if (this.currentStep < 8) {
@@ -651,6 +817,43 @@ export class CreateTripComponent implements OnInit {
     if (step <= this.maxVisitedStep) {
       this.currentStep = step;
     }
+  }
+
+  saveTripDraft() {
+    const dest = this.selectedDestination?.name || 'Destination';
+    const country = this.selectedDestination?.country || 'Wonderland';
+    const user = this.authService.currentUser();
+    const budgetObj = this.budgetTiers.find(b => b.name === this.selectedBudget);
+    const estBudget = budgetObj ? budgetObj.estAmount : 850;
+
+    this.tripService.createTrip({
+      name: `${dest} Draft Plan`,
+      destination: dest,
+      country,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      travelers: {
+        adults: this.adultsCount,
+        children: this.kidsCount
+      },
+      status: 'Planned',
+      budget: estBudget,
+      spent: 0,
+      coverImage: this.selectedDestination?.image || 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
+      preferences: [this.selectedStyle],
+      destinationsList: [dest],
+      notes: `Draft saved from Step ${this.currentStep}. Flight: ${this.selectedFlight}, Rooms: ${this.roomsCount}.`,
+      userId: user?.id || 'usr-1',
+      userName: user?.fullName || 'Traveler',
+      travelStyle: this.selectedStyle,
+      hotelName: this.selectedHotel?.name,
+      activities: this.selectedActivities,
+      progress: 30,
+      duration: this.getDurationText()
+    });
+
+    this.toastService.show('Trip saved as draft to My Trips!', 'success');
+    this.router.navigate(['/my-trips']);
   }
 
   createMyTrip() {
@@ -676,17 +879,17 @@ export class CreateTripComponent implements OnInit {
       coverImage: this.selectedDestination?.image || 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
       preferences: [this.selectedStyle],
       destinationsList: [dest],
-      notes: `Planned via TripSphere 8-Step Architect. ${this.selectedBudget} tier with ${this.selectedHotel?.name || 'Luxury Stay'}.`,
+      notes: `Planned via TripSphere 8-Step Architect. ${this.selectedBudget} tier with ${this.selectedHotel?.name || 'Luxury Stay'}. Flight: ${this.selectedFlight}, Rooms: ${this.roomsCount}.`,
       userId: user?.id || 'usr-1',
       userName: user?.fullName || 'Labdhi',
       travelStyle: this.selectedStyle,
       hotelName: this.selectedHotel?.name,
       activities: this.selectedActivities,
       progress: 65,
-      duration: '03 Days'
+      duration: this.getDurationText()
     });
 
-    // Navigate to user panel My Trips
+    this.toastService.show('Trip created successfully! Bon Voyage!', 'success');
     this.router.navigate(['/my-trips']);
   }
 }

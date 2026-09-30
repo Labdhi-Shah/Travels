@@ -86,6 +86,13 @@ import { AuthService } from '../../../core/services/auth.service';
             </button>
           </div>
 
+          <!-- Error Alert -->
+          @if (errorMessage) {
+            <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold">
+              {{ errorMessage }}
+            </div>
+          }
+
           <!-- Form -->
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
             <!-- Email -->
@@ -177,22 +184,27 @@ export class LoginComponent implements OnInit {
   });
 
   returnUrl = '/dashboard';
+  errorMessage = '';
 
   ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
   }
 
   onSubmit() {
+    this.errorMessage = '';
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
       const success = this.authService.login(email, password);
       if (success) {
         this.router.navigateByUrl(this.returnUrl);
+      } else {
+        this.errorMessage = 'Invalid email or password. Please try again or use 1-Click Demo Login.';
       }
     }
   }
 
   onDemoLogin() {
+    this.errorMessage = '';
     this.authService.login('alex.mercer@tripsphere.travel', 'password123');
     this.router.navigateByUrl(this.returnUrl);
   }

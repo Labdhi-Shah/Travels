@@ -15,6 +15,7 @@ import { SearchBarComponent } from '../../shared/search-bar/search-bar.component
 import { DestinationService } from '../../core/services/destination.service';
 import { PackageService } from '../../core/services/package.service';
 import { HotelService } from '../../core/services/hotel.service';
+import { FavoriteService } from '../../core/services/favorite.service';
 import { TestimonialService } from '../../core/services/testimonial.service';
 import { StoryService } from '../../core/services/story.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -110,16 +111,32 @@ interface TravelStory {
             Discover breathtaking destinations, plan custom day-by-day itineraries, and organize every part of your trip in one premium dashboard.
           </p>
 
-          <!-- Audio Toggle indicator -->
-          <div class="pt-1">
+          <!-- Hero Action CTAs (Explore & Plan My Trip) -->
+          <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <a
+              routerLink="/destinations"
+              class="px-6 py-3 rounded-full bg-[#D4A359] hover:bg-[#E5A93C] text-[#071F22] font-bold text-xs sm:text-sm tracking-wide flex items-center gap-2 shadow-lg shadow-[#D4A359]/25 hover:shadow-xl transition-all duration-300 active:scale-95 cursor-pointer"
+            >
+              <app-icon name="compass" [size]="16"></app-icon>
+              <span>Explore Destinations</span>
+            </a>
+
+            <a
+              routerLink="/plan-trip"
+              class="px-6 py-3 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-md border border-white/25 font-bold text-xs sm:text-sm tracking-wide flex items-center gap-2 transition-all duration-300 active:scale-95 cursor-pointer"
+            >
+              <app-icon name="plus" [size]="16"></app-icon>
+              <span>Plan My Trip</span>
+            </a>
+
             <button
               type="button"
               (click)="toggleMute()"
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white/90 text-xs font-medium transition-all duration-200 cursor-pointer"
+              class="inline-flex items-center gap-1.5 px-3.5 py-3 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white/90 text-xs font-medium transition-all duration-200 cursor-pointer"
               title="Toggle Audio"
             >
               <app-icon [name]="isVideoMuted() ? 'volume-x' : 'volume-2'" [size]="14"></app-icon>
-              <span>{{ isVideoMuted() ? 'Unmute Sound' : 'Mute Sound' }}</span>
+              <span class="hidden sm:inline">{{ isVideoMuted() ? 'Unmute Sound' : 'Mute Sound' }}</span>
             </button>
           </div>
 
@@ -154,18 +171,34 @@ interface TravelStory {
           @for (dest of eightPopularDestinations(); track dest.id) {
             <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group overflow-hidden">
               
-              <!-- Card Image with Category Badge -->
+              <!-- Card Image with Category Badge & Wishlist Button -->
               <div class="relative p-3 pb-0">
                 <div class="relative h-56 rounded-2xl overflow-hidden bg-slate-100">
-                  <img
-                    [src]="dest.image"
-                    [alt]="dest.name"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
+                  <a [routerLink]="['/destinations', dest.id]" class="block w-full h-full cursor-pointer">
+                    <img
+                      [src]="dest.image"
+                      [alt]="dest.name"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                  </a>
                   <!-- Category Badge (Amber Pill on bottom-left) -->
-                  <span class="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-[#E5A93C] text-[#071F22] text-[11px] font-bold shadow-md tracking-wider">
+                  <span class="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-[#E5A93C] text-[#071F22] text-[11px] font-bold shadow-md tracking-wider pointer-events-none">
                     {{ dest.badge }}
                   </span>
+                  <!-- Wishlist Button (Top-Right) -->
+                  <button
+                    type="button"
+                    (click)="toggleFavorite(dest.id, $event)"
+                    class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-red-500 backdrop-blur-md flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer z-10"
+                    [attr.aria-label]="isFavorite(dest.id) ? 'Remove from favorites' : 'Add to favorites'"
+                  >
+                    <app-icon
+                      name="heart"
+                      [size]="14"
+                      [isFilled]="isFavorite(dest.id)"
+                      [extraClass]="isFavorite(dest.id) ? 'text-red-500' : 'text-slate-600'"
+                    ></app-icon>
+                  </button>
                 </div>
               </div>
 
@@ -186,9 +219,11 @@ interface TravelStory {
                   </div>
 
                   <!-- Destination Name -->
-                  <h3 class="text-xl font-bold font-display text-[#0F1E26] group-hover:text-[#0C3B3E] transition-colors">
-                    {{ dest.name }}
-                  </h3>
+                  <a [routerLink]="['/destinations', dest.id]" class="block group-hover:text-[#0C3B3E] transition-colors cursor-pointer">
+                    <h3 class="text-xl font-bold font-display text-[#0F1E26] leading-tight">
+                      {{ dest.name }}
+                    </h3>
+                  </a>
 
                   <!-- Description -->
                   <p class="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed line-clamp-2">
@@ -258,23 +293,39 @@ interface TravelStory {
             @for (pkg of eightFeaturedPackages(); track pkg.id) {
               <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group overflow-hidden">
                 
-                <!-- Package Image with Duration & Travelers Badges -->
+                <!-- Package Image with Duration, Travelers & Wishlist Badges -->
                 <div class="relative p-3 pb-0">
                   <div class="relative h-56 rounded-2xl overflow-hidden bg-slate-100">
-                    <img
-                      [src]="pkg.image"
-                      [alt]="pkg.name"
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
+                    <a [routerLink]="['/packages', pkg.id]" class="block w-full h-full cursor-pointer">
+                      <img
+                        [src]="pkg.image"
+                        [alt]="pkg.name"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                    </a>
                     <!-- Duration Badge (Top Left) -->
-                    <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold">
+                    <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold pointer-events-none">
                       {{ pkg.durationDays }} Days
                     </span>
                     <!-- Travelers Badge (Top Right) -->
-                    <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1">
+                    <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1 pointer-events-none">
                       <app-icon name="users" [size]="12"></app-icon>
                       <span>{{ pkg.maxTravelers }} Travelers</span>
                     </span>
+                    <!-- Wishlist Button (Bottom Right) -->
+                    <button
+                      type="button"
+                      (click)="toggleFavorite(pkg.id, $event)"
+                      class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-red-500 backdrop-blur-md flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer z-10"
+                      [attr.aria-label]="isFavorite(pkg.id) ? 'Remove from favorites' : 'Add to favorites'"
+                    >
+                      <app-icon
+                        name="heart"
+                        [size]="14"
+                        [isFilled]="isFavorite(pkg.id)"
+                        [extraClass]="isFavorite(pkg.id) ? 'text-red-500' : 'text-slate-600'"
+                      ></app-icon>
+                    </button>
                   </div>
                 </div>
 
@@ -289,9 +340,11 @@ interface TravelStory {
                     </div>
 
                     <!-- Title -->
-                    <h3 class="text-lg font-bold font-display text-[#0F1E26] group-hover:text-[#0C3B3E] transition-colors leading-tight line-clamp-1">
-                      {{ pkg.name }}
-                    </h3>
+                    <a [routerLink]="['/packages', pkg.id]" class="block group-hover:text-[#0C3B3E] transition-colors cursor-pointer">
+                      <h3 class="text-lg font-bold font-display text-[#0F1E26] leading-tight line-clamp-1">
+                        {{ pkg.name }}
+                      </h3>
+                    </a>
 
                     <!-- Description -->
                     <p class="text-xs text-slate-500 font-normal leading-relaxed line-clamp-2">
@@ -359,19 +412,35 @@ interface TravelStory {
           @for (hotel of threeFeaturedHotels(); track hotel.id) {
             <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group overflow-hidden">
               
-              <!-- Hotel Image -->
+              <!-- Hotel Image & Wishlist Button -->
               <div class="relative p-3 pb-0">
                 <div class="relative h-56 rounded-2xl overflow-hidden bg-slate-100">
-                  <img
-                    [src]="hotel.image"
-                    [alt]="hotel.name"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
+                  <a [routerLink]="['/hotels', hotel.id]" class="block w-full h-full cursor-pointer">
+                    <img
+                      [src]="hotel.image"
+                      [alt]="hotel.name"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                  </a>
                   <!-- Rating Badge (Top Right) -->
-                  <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[#E5A93C] text-xs font-bold flex items-center gap-1">
+                  <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[#E5A93C] text-xs font-bold flex items-center gap-1 pointer-events-none">
                     <app-icon name="star" [size]="12" [isFilled]="true"></app-icon>
                     <span>{{ hotel.rating }}</span>
                   </span>
+                  <!-- Wishlist Button (Top Left) -->
+                  <button
+                    type="button"
+                    (click)="toggleFavorite(hotel.id, $event)"
+                    class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-red-500 backdrop-blur-md flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer z-10"
+                    [attr.aria-label]="isFavorite(hotel.id) ? 'Remove from favorites' : 'Add to favorites'"
+                  >
+                    <app-icon
+                      name="heart"
+                      [size]="14"
+                      [isFilled]="isFavorite(hotel.id)"
+                      [extraClass]="isFavorite(hotel.id) ? 'text-red-500' : 'text-slate-600'"
+                    ></app-icon>
+                  </button>
                 </div>
               </div>
 
@@ -379,9 +448,11 @@ interface TravelStory {
               <div class="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
                 
                 <div class="space-y-2">
-                  <h3 class="text-lg font-bold font-display text-[#0F1E26] group-hover:text-[#0C3B3E] transition-colors leading-tight">
-                    {{ hotel.name }}
-                  </h3>
+                  <a [routerLink]="['/hotels', hotel.id]" class="block group-hover:text-[#0C3B3E] transition-colors cursor-pointer">
+                    <h3 class="text-lg font-bold font-display text-[#0F1E26] leading-tight">
+                      {{ hotel.name }}
+                    </h3>
+                  </a>
 
                   <!-- Location -->
                   <div class="flex items-center gap-1.5 text-xs text-slate-400">
@@ -671,8 +742,19 @@ export class HomeComponent implements OnInit {
   private destService = inject(DestinationService);
   private pkgService = inject(PackageService);
   private hotelService = inject(HotelService);
+  private favoriteService = inject(FavoriteService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+
+  isFavorite(id: string): boolean {
+    return this.favoriteService.isFavorite(id);
+  }
+
+  toggleFavorite(id: string, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.favoriteService.toggleFavorite(id);
+  }
 
   @ViewChild('heroVideo') heroVideoRef?: ElementRef<HTMLVideoElement>;
 

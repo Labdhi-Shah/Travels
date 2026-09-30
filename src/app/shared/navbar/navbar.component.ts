@@ -91,24 +91,103 @@ interface NavLink {
             }
           </a>
 
-          <!-- Profile / Login / Register matching Reference Image -->
+          <!-- Profile / Login / Register with Dropdown Menu -->
           @if (authService.isAuthenticated()) {
-            <a
-              routerLink="/dashboard"
-              class="flex items-center gap-2 pl-1 group cursor-pointer text-white"
-              title="Dashboard"
-            >
-              <img
-                [src]="authService.currentUser()?.avatar"
-                [alt]="authService.currentUser()?.fullName"
-                class="w-8 h-8 rounded-full object-cover border-2 border-[#D4A359] group-hover:scale-105 transition-transform"
-              />
-              <span
-                class="text-xs font-semibold hidden xl:inline text-white"
+            <div class="relative" (click)="$event.stopPropagation()">
+              <button
+                type="button"
+                (click)="isUserMenuOpen = !isUserMenuOpen"
+                class="flex items-center gap-2 pl-1 group cursor-pointer text-white focus:outline-none"
+                title="Account Menu"
               >
-                Dashboard
-              </span>
-            </a>
+                <img
+                  [src]="authService.currentUser()?.avatar"
+                  [alt]="authService.currentUser()?.fullName"
+                  class="w-8 h-8 rounded-full object-cover border-2 border-[#D4A359] group-hover:scale-105 transition-transform"
+                />
+                <span class="text-xs font-semibold hidden xl:inline text-white">
+                  {{ authService.currentUser()?.fullName?.split(' ')?.at(0) || 'Account' }}
+                </span>
+                <app-icon name="chevron-down" [size]="13" extraClass="text-[#D4A359] transition-transform" [class.rotate-180]="isUserMenuOpen"></app-icon>
+              </button>
+
+              @if (isUserMenuOpen) {
+                <div
+                  class="absolute right-0 mt-3 w-56 bg-[#071F22] text-white rounded-2xl p-2 shadow-2xl border border-white/10 animate-fade-in z-50 text-xs"
+                >
+                  <div class="px-3 py-2 border-b border-white/10 mb-1">
+                    <p class="font-bold text-white truncate">{{ authService.currentUser()?.fullName }}</p>
+                    <p class="text-[10px] text-slate-300 truncate">{{ authService.currentUser()?.email }}</p>
+                  </div>
+                  <a
+                    routerLink="/dashboard"
+                    (click)="isUserMenuOpen = false"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <app-icon name="activity" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                    <span>Dashboard</span>
+                  </a>
+                  <a
+                    routerLink="/my-trips"
+                    (click)="isUserMenuOpen = false"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <app-icon name="map" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                    <span>My Trips</span>
+                  </a>
+                  <a
+                    routerLink="/plan-trip"
+                    (click)="isUserMenuOpen = false"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <app-icon name="plus" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                    <span>Plan My Trip</span>
+                  </a>
+                  <a
+                    routerLink="/favorites"
+                    (click)="isUserMenuOpen = false"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <app-icon name="heart" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                    <span>Saved Favorites</span>
+                  </a>
+                  <a
+                    routerLink="/bookings"
+                    (click)="isUserMenuOpen = false"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <app-icon name="credit-card" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                    <span>My Bookings</span>
+                  </a>
+                  <a
+                    routerLink="/budget"
+                    (click)="isUserMenuOpen = false"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <app-icon name="dollar-sign" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                    <span>Budget Tracker</span>
+                  </a>
+                  <a
+                    routerLink="/profile"
+                    (click)="isUserMenuOpen = false"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <app-icon name="user" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                    <span>Profile & Settings</span>
+                  </a>
+                  <div class="border-t border-white/10 mt-1 pt-1">
+                    <button
+                      type="button"
+                      (click)="authService.logout(); isUserMenuOpen = false"
+                      class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer text-left"
+                    >
+                      <app-icon name="log-out" [size]="14"></app-icon>
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
           } @else {
             <a
               routerLink="/login"
@@ -132,7 +211,7 @@ interface NavLink {
             type="button"
             (click)="toggleSearchModal()"
             class="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer"
-            [ngClass]="isTransparent() ? 'bg-white/15 text-white border border-white/20' : 'bg-slate-100 text-slate-800'"
+            [ngClass]="isTransparent() ? 'bg-white/15 text-white border border-white/20' : 'bg-white/10 text-white'"
             aria-label="Search"
           >
             <app-icon name="search" [size]="16"></app-icon>
@@ -142,7 +221,7 @@ interface NavLink {
             type="button"
             (click)="isMobileMenuOpen = !isMobileMenuOpen"
             class="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-colors"
-            [ngClass]="isTransparent() ? 'bg-white/15 text-white border border-white/20' : 'bg-slate-100 text-slate-800'"
+            [ngClass]="isTransparent() ? 'bg-white/15 text-white border border-white/20' : 'bg-white/10 text-white'"
             [attr.aria-expanded]="isMobileMenuOpen"
             aria-label="Toggle Navigation Menu"
           >
@@ -154,15 +233,15 @@ interface NavLink {
 
       <!-- SMOOTH MOBILE NAVIGATION DRAWER -->
       @if (isMobileMenuOpen) {
-        <div class="lg:hidden mt-3 p-4 rounded-2xl bg-white/98 backdrop-blur-xl shadow-2xl border border-slate-200 animate-fade-in space-y-3">
+        <div class="lg:hidden mt-3 p-4 rounded-3xl bg-[#071F22]/98 backdrop-blur-xl shadow-2xl border border-white/15 animate-fade-in space-y-3 text-white">
           <nav class="flex flex-col space-y-1">
             @for (link of navLinks; track link.label) {
               <a
                 [routerLink]="link.path"
                 (click)="isMobileMenuOpen = false"
-                routerLinkActive="bg-blue-50 text-[#0084FF] font-bold"
+                routerLinkActive="bg-[#D4A359]/20 text-[#D4A359] font-bold border-l-2 border-[#D4A359]"
                 [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
-                class="px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-800 hover:bg-slate-50 transition-colors"
+                class="px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/10 transition-colors"
               >
                 {{ link.label }}
               </a>
@@ -170,36 +249,36 @@ interface NavLink {
             <a
               routerLink="/favorites"
               (click)="isMobileMenuOpen = false"
-              routerLinkActive="bg-blue-50 text-[#0084FF] font-bold"
-              class="px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-800 hover:bg-slate-50 transition-colors flex items-center justify-between"
+              routerLinkActive="bg-[#D4A359]/20 text-[#D4A359] font-bold border-l-2 border-[#D4A359]"
+              class="px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/10 transition-colors flex items-center justify-between"
             >
               <span>Saved Favorites</span>
               @if (favoriteService.favoriteCount() > 0) {
-                <span class="px-2 py-0.5 rounded-full bg-[#0084FF] text-white text-xs font-bold">
+                <span class="px-2 py-0.5 rounded-full bg-[#D4A359] text-[#071F22] text-xs font-bold">
                   {{ favoriteService.favoriteCount() }}
                 </span>
               }
             </a>
           </nav>
 
-          <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
+          <div class="pt-3 border-t border-white/10 flex items-center justify-between">
             @if (authService.isAuthenticated()) {
               <a
                 routerLink="/dashboard"
                 (click)="isMobileMenuOpen = false"
-                class="flex items-center gap-2.5 py-1 text-sm font-semibold text-slate-800"
+                class="flex items-center gap-2.5 py-1 text-sm font-semibold text-white"
               >
                 <img
                   [src]="authService.currentUser()?.avatar"
                   [alt]="authService.currentUser()?.fullName"
-                  class="w-8 h-8 rounded-full object-cover border border-slate-300"
+                  class="w-8 h-8 rounded-full object-cover border border-[#D4A359]"
                 />
                 <span>{{ authService.currentUser()?.fullName }}</span>
               </a>
               <button
                 type="button"
                 (click)="authService.logout(); isMobileMenuOpen = false"
-                class="text-xs text-[#0084FF] font-semibold cursor-pointer"
+                class="text-xs text-[#D4A359] hover:underline font-semibold cursor-pointer"
               >
                 Sign Out
               </button>
@@ -208,14 +287,14 @@ interface NavLink {
                 <a
                   routerLink="/login"
                   (click)="isMobileMenuOpen = false"
-                  class="flex-1 text-center py-2.5 rounded-xl border border-slate-300 text-slate-800 text-sm font-semibold"
+                  class="flex-1 text-center py-2.5 rounded-xl border border-white/20 text-white text-sm font-semibold hover:bg-white/10 transition-colors"
                 >
                   Login
                 </a>
                 <a
                   routerLink="/register"
                   (click)="isMobileMenuOpen = false"
-                  class="flex-1 text-center py-2.5 rounded-xl bg-[#0084FF] text-white text-sm font-semibold shadow-md"
+                  class="flex-1 text-center py-2.5 rounded-xl bg-[#D4A359] text-[#071F22] text-sm font-bold shadow-md hover:bg-[#E5A93C] transition-colors"
                 >
                   Sign Up
                 </a>
@@ -284,20 +363,26 @@ export class NavbarComponent implements OnInit {
   isScrolled = false;
   isMobileMenuOpen = false;
   isSearchOpen = false;
+  isUserMenuOpen = false;
   searchQuery = '';
   isHomePage = signal(true);
 
-  // Navigation Links matching reference image (Screenshot 1):
+  // Navigation Links including all requested routes:
   navLinks: NavLink[] = [
     { label: 'Home', path: '/', exact: true },
-    { label: 'Plan My Trip', path: '/plan-trip' },
+    { label: 'Destinations', path: '/destinations' },
     { label: 'Packages', path: '/packages' },
-    { label: 'Flights', path: '/flights' },
     { label: 'Hotels', path: '/hotels' },
     { label: 'Experiences', path: '/experiences' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' }
+    { label: 'Flights', path: '/flights' },
+    { label: 'Plan My Trip', path: '/plan-trip' },
+    { label: 'My Trips', path: '/my-trips' }
   ];
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.isUserMenuOpen = false;
+  }
 
   ngOnInit() {
     this.checkRoute(this.router.url);

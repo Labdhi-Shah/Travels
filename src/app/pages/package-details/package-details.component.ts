@@ -149,7 +149,7 @@ import { ModalComponent } from '../../shared/modal/modal.component';
                 </select>
               </div>
 
-              <!-- CTA BUTTONS: "Book Package" (Dark Teal / Gold) & "Save" (Secondary) -->
+              <!-- CTA BUTTONS: "Book Package", "Customize", & "Save" -->
               <div class="pt-2 space-y-2.5">
                 <button
                   type="button"
@@ -160,10 +160,19 @@ import { ModalComponent } from '../../shared/modal/modal.component';
                   <span>Book Package</span>
                 </button>
 
+                <a
+                  [routerLink]="['/plan-trip']"
+                  [queryParams]="{ destination: pkg.destination }"
+                  class="w-full py-3 px-6 rounded-xl bg-[#F8F7F3] hover:bg-[#EFEDE7] text-[#0B1320] border border-[#EFEDE7] font-bold text-sm transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <app-icon name="compass" [size]="16" extraClass="text-[#D4A359]"></app-icon>
+                  <span>Customize in Plan My Trip</span>
+                </a>
+
                 <button
                   type="button"
                   (click)="toggleSave()"
-                  class="w-full py-3 px-6 rounded-xl bg-transparent hover:bg-[#EFEDE7]/70 text-[#0B1320] border border-[#0B1320]/20 font-bold text-sm transition-all cursor-pointer flex items-center justify-center gap-2"
+                  class="w-full py-2.5 px-6 rounded-xl bg-transparent hover:bg-[#EFEDE7]/70 text-[#0B1320] border border-[#0B1320]/20 font-bold text-sm transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <app-icon
                     name="heart"

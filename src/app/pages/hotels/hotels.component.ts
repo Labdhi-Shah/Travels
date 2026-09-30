@@ -237,6 +237,6 @@ export class HotelsComponent implements OnInit {
     });
 
     this.bookingHotel = null;
-    this.router.navigate(['/dashboard/bookings']);
+    this.router.navigate(['/bookings']);
   }
 }

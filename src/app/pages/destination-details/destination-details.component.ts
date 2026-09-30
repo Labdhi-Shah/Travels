@@ -52,6 +52,15 @@ type TabType = 'about' | 'places' | 'activities' | 'hotels' | 'tips' | 'weather'
                 ></app-icon>
                 <span>{{ isFavorite ? 'Saved to Favorites' : 'Save Destination' }}</span>
               </button>
+
+              <a
+                [routerLink]="['/plan-trip']"
+                [queryParams]="{ destination: destination.name }"
+                class="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold shadow-sm hover:shadow-md transition-all cursor-pointer"
+              >
+                <app-icon name="compass" [size]="14"></app-icon>
+                <span>Plan Trip Here</span>
+              </a>
             </div>
           </div>
 

@@ -106,7 +106,7 @@ export class AuthService {
   logout(): void {
     this.userSignal.set(null);
     this.storage.removeItem('current_user');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   updateProfile(updated: Partial<UserProfile>): void {

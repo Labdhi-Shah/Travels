@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
 import { TripCardComponent } from '../../../shared/trip-card/trip-card.component';
 import { ModalComponent } from '../../../shared/modal/modal.component';
 import { EmptyStateComponent } from '../../../shared/empty-state/empty-state.component';
 import { TripService } from '../../../core/services/trip.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Trip } from '../../../models/trip.model';
 
 @Component({
@@ -175,6 +176,8 @@ import { Trip } from '../../../models/trip.model';
 })
 export class MyTripsComponent {
   private tripService = inject(TripService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
 
   statusTabs = ['All Journeys', 'Upcoming', 'Completed'];
   activeTab = 'All Journeys';
@@ -219,6 +222,7 @@ export class MyTripsComponent {
         status: this.editingTrip.status,
         notes: this.editingTrip.notes
       });
+      this.toastService.success('Trip updated successfully');
       this.editingTrip = null;
     }
   }
@@ -226,10 +230,11 @@ export class MyTripsComponent {
   deleteTrip(trip: Trip): void {
     if (confirm(`Are you sure you want to delete "${trip.name}"?`)) {
       this.tripService.deleteTrip(trip.id);
+      this.toastService.success('Trip removed from your workspace');
     }
   }
 
   createFirstTrip(): void {
-    // Handled via routerLink
+    this.router.navigate(['/plan-trip']);
   }
 }

@@ -35,32 +35,36 @@ import { LucideIconComponent } from '../icon/lucide-icon.component';
             <!-- Social Media Buttons -->
             <div class="flex items-center gap-3 pt-2">
               <a
-                href="#"
-                (click)="$event.preventDefault()"
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#D4A359] hover:text-[#07191C] text-white/80 flex items-center justify-center transition-all duration-200 shadow-sm"
                 aria-label="X / Twitter"
               >
                 <app-icon name="share-2" [size]="14"></app-icon>
               </a>
               <a
-                href="#"
-                (click)="$event.preventDefault()"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#D4A359] hover:text-[#07191C] text-white/80 flex items-center justify-center transition-all duration-200 shadow-sm"
                 aria-label="Globe Travel"
               >
                 <app-icon name="globe" [size]="14"></app-icon>
               </a>
               <a
-                href="#"
-                (click)="$event.preventDefault()"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#D4A359] hover:text-[#07191C] text-white/80 flex items-center justify-center transition-all duration-200 shadow-sm"
                 aria-label="Instagram"
               >
                 <app-icon name="camera" [size]="14"></app-icon>
               </a>
               <a
-                href="#"
-                (click)="$event.preventDefault()"
+                href="https://telegram.org"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="w-8 h-8 rounded-full bg-white/10 hover:bg-[#D4A359] hover:text-[#07191C] text-white/80 flex items-center justify-center transition-all duration-200 shadow-sm"
                 aria-label="Send"
               >

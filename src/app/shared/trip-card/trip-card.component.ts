@@ -15,23 +15,25 @@ import { Trip } from '../../models/trip.model';
     >
       <!-- Left/Top Large Travel Photography Container -->
       <div class="relative w-full md:w-80 lg:w-96 min-h-[220px] md:min-h-full overflow-hidden shrink-0 bg-[#EFEDE7]">
-        <img
-          [src]="trip.coverImage"
-          [alt]="trip.name"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-          loading="lazy"
-        />
+        <a [routerLink]="['/my-trips', trip.id]" class="block w-full h-full cursor-pointer">
+          <img
+            [src]="trip.coverImage"
+            [alt]="trip.name"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            loading="lazy"
+          />
+        </a>
         <div class="absolute inset-0 bg-gradient-to-t from-[#0B1320]/80 via-transparent to-black/30 pointer-events-none"></div>
 
         <!-- Destination Tag Overlay -->
-        <div class="absolute top-4 left-4">
+        <div class="absolute top-4 left-4 pointer-events-none">
           <span class="px-3 py-1 rounded-md bg-[#0B1320]/80 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-md">
             {{ trip.destination.split(',')[0] }}
           </span>
         </div>
 
         <!-- Duration badge -->
-        <div class="absolute bottom-4 left-4">
+        <div class="absolute bottom-4 left-4 pointer-events-none">
           <p class="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight uppercase">
             {{ trip.destination.split(',')[0] }}
           </p>
@@ -51,9 +53,11 @@ import { Trip } from '../../models/trip.model';
               <span class="text-xs font-bold text-[#D4A359] uppercase tracking-wider">
                 {{ trip.country }}
               </span>
-              <h3 class="text-xl sm:text-2xl font-bold text-[#071F22] font-display mt-0.5 group-hover:text-[#D4A359] transition-colors">
-                {{ trip.name }}
-              </h3>
+              <a [routerLink]="['/my-trips', trip.id]" class="block group-hover:text-[#D4A359] transition-colors cursor-pointer">
+                <h3 class="text-xl sm:text-2xl font-bold text-[#071F22] font-display mt-0.5">
+                  {{ trip.name }}
+                </h3>
+              </a>
               <p class="text-xs text-[#6B7280] mt-1 flex items-center gap-1.5">
                 <app-icon name="map-pin" [size]="13" extraClass="text-[#6B7280]"></app-icon>
                 <span>{{ trip.destination }}</span>
@@ -124,6 +128,13 @@ import { Trip } from '../../models/trip.model';
               class="px-3.5 py-1.5 rounded-xl bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#0A2D30] text-xs font-bold text-white transition-colors shadow-sm"
             >
               View Trip
+            </a>
+            <a
+              [routerLink]="['/itinerary']"
+              [queryParams]="{ tripId: trip.id }"
+              class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0A2D30] hover:text-white text-xs font-bold text-[#071F22] transition-colors cursor-pointer"
+            >
+              View Itinerary
             </a>
             <button
               type="button"
