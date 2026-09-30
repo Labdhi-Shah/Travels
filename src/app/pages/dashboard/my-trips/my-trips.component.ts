@@ -22,15 +22,15 @@ import { Trip } from '../../../models/trip.model';
     EmptyStateComponent
   ],
   template: `
-    <div class="space-y-8 animate-fade-in pb-16 text-[#17202A]">
+    <div class="space-y-8 animate-fade-in pb-16 pt-2 sm:pt-4 text-[#17202A]">
       
       <!-- Top Title Bar -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-[#0084FF]">
+          <span class="text-xs font-bold uppercase tracking-widest text-[#D4A359]">
             TRAVEL DISPATCHES
           </span>
-          <h1 class="text-2xl sm:text-4xl font-bold font-display text-[#071328] mt-0.5">
+          <h1 class="text-2xl sm:text-4xl font-bold font-display text-[#071F22] mt-0.5">
             My Journeys
           </h1>
           <p class="text-xs sm:text-sm text-[#6B7280] font-light">
@@ -40,7 +40,7 @@ import { Trip } from '../../../models/trip.model';
 
         <a
           routerLink="/plan-trip"
-          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0084FF] hover:bg-[#0070D8] text-white font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95 shrink-0 self-start sm:self-auto cursor-pointer"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95 shrink-0 self-start sm:self-auto cursor-pointer"
         >
           <app-icon name="plus" [size]="16"></app-icon>
           <span>Plan New Journey</span>
@@ -48,18 +48,18 @@ import { Trip } from '../../../models/trip.model';
       </div>
 
       <!-- Filters & Search Bar -->
-      <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="bg-white p-4 sm:p-5 rounded-3xl border border-[#EFEDE7] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         
         <!-- Status Tabs -->
-        <div class="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
+        <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
           @for (tab of statusTabs; track tab) {
             <button
               type="button"
               (click)="selectTab(tab)"
               class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer"
               [ngClass]="activeTab === tab
-                ? 'bg-[#0084FF] text-white shadow-sm'
-                : 'bg-slate-100 text-[#6B7280] hover:bg-slate-200'"
+                ? 'bg-[#0A2D30] text-[#D4A359] shadow-sm'
+                : 'bg-[#F8F7F3] text-[#071F22] hover:bg-[#EFEDE7] border border-[#EFEDE7]'"
             >
               {{ tab }}
             </button>
@@ -73,7 +73,7 @@ import { Trip } from '../../../models/trip.model';
             type="text"
             [(ngModel)]="searchQuery"
             placeholder="Search destination, city..."
-            class="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#0084FF]"
+            class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#F8F7F3] border border-[#EFEDE7] text-xs font-medium focus:outline-none focus:border-[#D4A359]"
           />
         </div>
       </div>
@@ -114,7 +114,7 @@ import { Trip } from '../../../models/trip.model';
               <input
                 type="text"
                 [(ngModel)]="editingTrip.name"
-                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-[#0084FF]"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F7F3] border border-[#EFEDE7] text-sm focus:outline-none focus:border-[#D4A359]"
               />
             </div>
 
@@ -124,7 +124,7 @@ import { Trip } from '../../../models/trip.model';
                 <input
                   type="number"
                   [(ngModel)]="editingTrip.budget"
-                  class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-[#D4A359]"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F7F3] border border-[#EFEDE7] text-sm focus:outline-none focus:border-[#D4A359]"
                 />
               </div>
 
@@ -132,7 +132,7 @@ import { Trip } from '../../../models/trip.model';
                 <label class="block text-xs font-bold uppercase text-[#6B7280] mb-1">Status</label>
                 <select
                   [(ngModel)]="editingTrip.status"
-                  class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-[#0084FF]"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F7F3] border border-[#EFEDE7] text-sm focus:outline-none focus:border-[#D4A359]"
                 >
                   <option value="Upcoming">Upcoming</option>
                   <option value="Ongoing">Ongoing</option>
@@ -146,7 +146,7 @@ import { Trip } from '../../../models/trip.model';
               <textarea
                 [(ngModel)]="editingTrip.notes"
                 rows="3"
-                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-[#0084FF]"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F7F3] border border-[#EFEDE7] text-sm focus:outline-none focus:border-[#D4A359]"
               ></textarea>
             </div>
 
@@ -154,14 +154,14 @@ import { Trip } from '../../../models/trip.model';
               <button
                 type="button"
                 (click)="editingTrip = null"
-                class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-[#17202A] hover:bg-slate-100 cursor-pointer"
+                class="px-4 py-2 rounded-xl border border-[#EFEDE7] text-xs font-semibold text-[#17202A] hover:bg-[#EFEDE7] cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 (click)="saveTripEdit()"
-                class="px-6 py-2.5 rounded-xl bg-[#0084FF] hover:bg-[#0070D8] text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
+                class="px-6 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
               >
                 Save Changes
               </button>
