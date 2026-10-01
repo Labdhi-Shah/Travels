@@ -4,6 +4,8 @@ import { StorageService } from './storage.service';
 import { UserProfile } from '../../models/user.model';
 import { MOCK_USERS } from '../../data/mock-users';
 
+export const DEMO_PASSWORD = '123456';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,6 +28,11 @@ export class AuthService {
 
   login(email: string, password?: string, rememberMe = true): boolean {
     const cleanEmail = (email || '').trim().toLowerCase();
+
+    // Check fixed frontend demo password requirement: "123456"
+    if (!password || password.trim() !== DEMO_PASSWORD) {
+      return false;
+    }
 
     // Check existing users
     const allUsers = this.usersSignal();
@@ -55,13 +62,20 @@ export class AuthService {
 
     this.userSignal.set(found);
     this.storage.setItem('current_user', found);
+    this.storage.setItem('login_session', {
+      isLoggedIn: true,
+      email: found.email,
+      userName: found.fullName,
+      role: found.role,
+      token: 'tripsphere_session_token_' + Date.now(),
+      loggedInAt: new Date().toISOString()
+    });
     return true;
   }
 
   demoLogin(): void {
     const demo = this.usersSignal().find(u => u.id === 'usr-1') || MOCK_USERS[0];
-    this.userSignal.set(demo);
-    this.storage.setItem('current_user', demo);
+    this.login(demo.email, DEMO_PASSWORD);
   }
 
   register(fullNameOrData: string | any, email?: string, password?: string): boolean {
@@ -106,6 +120,7 @@ export class AuthService {
   logout(): void {
     this.userSignal.set(null);
     this.storage.removeItem('current_user');
+    this.storage.removeItem('login_session');
     this.router.navigate(['/']);
   }
 

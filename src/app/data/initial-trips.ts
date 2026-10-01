@@ -12,7 +12,8 @@ export const INITIAL_TRIPS: Trip[] = [
       adults: 2,
       children: 0
     },
-    status: 'Planned',
+    rooms: 1,
+    status: 'Confirmed',
     budget: 30000,
     spent: 18999,
     coverImage: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
@@ -24,8 +25,10 @@ export const INITIAL_TRIPS: Trip[] = [
     userName: 'Labdhi',
     travelStyle: 'Relaxing',
     hotelName: 'Taj Exotica Resort & Spa',
+    flight: 'IndiGo 6E-204 (BOM → GOI)',
     activities: ['Beach Visit', 'Old Goa Heritage Walk', 'Sunset Cruise'],
-    progress: 65,
+    additionalPreferences: 'Ocean-view Balcony, Gourmet Breakfast & Airport Transfer',
+    progress: 85,
     duration: '03 Days'
   },
   {

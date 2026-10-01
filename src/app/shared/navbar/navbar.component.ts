@@ -113,7 +113,7 @@ interface NavLink {
 
               @if (isUserMenuOpen) {
                 <div
-                  class="absolute right-0 mt-3 w-56 bg-[#071F22] text-white rounded-2xl p-2 shadow-2xl border border-white/10 animate-fade-in z-50 text-xs"
+                  class="absolute right-0 mt-3 w-56 bg-[#071F22] text-white rounded-2xl p-2 shadow-2xl border border-white/10 animate-dropdown-in z-50 text-xs"
                 >
                   <div class="px-3 py-2 border-b border-white/10 mb-1">
                     <p class="font-bold text-white truncate">{{ authService.currentUser()?.fullName }}</p>
@@ -233,7 +233,7 @@ interface NavLink {
 
       <!-- SMOOTH MOBILE NAVIGATION DRAWER -->
       @if (isMobileMenuOpen) {
-        <div class="lg:hidden mt-3 p-4 rounded-3xl bg-[#071F22]/98 backdrop-blur-xl shadow-2xl border border-white/15 animate-fade-in space-y-3 text-white">
+        <div class="lg:hidden mt-3 p-4 rounded-3xl bg-[#071F22]/98 backdrop-blur-xl shadow-2xl border border-white/15 animate-mobile-menu space-y-3 text-white">
           <nav class="flex flex-col space-y-1">
             @for (link of navLinks; track link.label) {
               <a
@@ -308,11 +308,11 @@ interface NavLink {
     <!-- Quick Search Popover Modal -->
     @if (isSearchOpen) {
       <div
-        class="fixed inset-0 z-50 bg-[#0B1320]/60 backdrop-blur-sm flex items-start justify-center pt-24 px-4 animate-fade-in"
+        class="fixed inset-0 z-50 bg-[#0B1320]/60 backdrop-blur-sm flex items-start justify-center pt-24 px-4 animate-modal-backdrop"
         (click)="isSearchOpen = false"
       >
         <div
-          class="w-full max-w-xl bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#0B1320]/10"
+          class="w-full max-w-xl bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#0B1320]/10 animate-modal-card"
           (click)="$event.stopPropagation()"
         >
           <div class="flex items-center justify-between mb-4">
@@ -367,15 +367,12 @@ export class NavbarComponent implements OnInit {
   searchQuery = '';
   isHomePage = signal(true);
 
-  // Navigation Links including all requested routes:
   navLinks: NavLink[] = [
     { label: 'Home', path: '/', exact: true },
-    { label: 'Destinations', path: '/destinations' },
+    { label: 'Plan My Trip', path: '/plan-trip' },
     { label: 'Packages', path: '/packages' },
     { label: 'Hotels', path: '/hotels' },
     { label: 'Experiences', path: '/experiences' },
-    { label: 'Flights', path: '/flights' },
-    { label: 'Plan My Trip', path: '/plan-trip' },
     { label: 'My Trips', path: '/my-trips' }
   ];
 

@@ -1,5 +1,8 @@
+export type TripStatus = 'Draft' | 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Upcoming' | 'Ongoing' | 'Planned';
+
 export interface Trip {
   id: string;
+  tripId?: string;
   name: string;
   destination: string;
   country: string;
@@ -8,8 +11,10 @@ export interface Trip {
   travelers: {
     adults: number;
     children: number;
+    total?: number;
   };
-  status: 'Upcoming' | 'Ongoing' | 'Completed' | 'Planned';
+  rooms?: number;
+  status: TripStatus;
   budget: number;
   spent: number;
   coverImage: string;
@@ -21,7 +26,10 @@ export interface Trip {
   userName?: string;
   travelStyle?: string;
   hotelName?: string;
+  flight?: string;
   activities?: string[];
+  additionalPreferences?: string;
   progress?: number;
   duration?: string;
 }
+

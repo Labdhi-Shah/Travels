@@ -76,11 +76,14 @@ import { AuthService } from '../../../core/services/auth.service';
 
           <!-- Quick 1-Click Demo Login Banner -->
           <div class="p-3.5 bg-[#EFEDE7]/70 rounded-2xl border border-[#EFEDE7] flex items-center justify-between gap-3">
-            <span class="text-xs text-[#17202A] font-medium">Quick preview?</span>
+            <div>
+              <span class="text-xs text-[#17202A] font-bold block">Demo Access</span>
+              <span class="text-[11px] text-[#6B7280]">Fixed Demo Password: <strong class="text-[#0A2D30] font-mono font-bold bg-[#D4A359]/20 px-1.5 py-0.5 rounded">123456</strong></span>
+            </div>
             <button
               type="button"
               (click)="onDemoLogin()"
-              class="px-3.5 py-1.5 rounded-xl bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#0A2D30] text-white text-xs font-bold transition-colors cursor-pointer shrink-0"
+              class="px-3.5 py-1.5 rounded-xl bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#0A2D30] text-white text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
             >
               1-Click Demo Login
             </button>
@@ -88,8 +91,9 @@ import { AuthService } from '../../../core/services/auth.service';
 
           <!-- Error Alert -->
           @if (errorMessage) {
-            <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold">
-              {{ errorMessage }}
+            <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold animate-fade-in flex items-center gap-2">
+              <app-icon name="alert-circle" [size]="16" extraClass="text-rose-600 shrink-0"></app-icon>
+              <span>{{ errorMessage }}</span>
             </div>
           }
 
@@ -104,7 +108,7 @@ import { AuthService } from '../../../core/services/auth.service';
                   type="email"
                   formControlName="email"
                   placeholder="alex.mercer@tripsphere.travel"
-                  class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#EFEDE7]/40 border border-[#0B1320]/10 text-sm focus:outline-none focus:border-[#D4A359]"
+                  class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#EFEDE7]/40 border border-[#0B1320]/10 text-sm focus:outline-none focus:border-[#D4A359] transition-all"
                 />
               </div>
               @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
@@ -116,17 +120,17 @@ import { AuthService } from '../../../core/services/auth.service';
             <div class="space-y-1.5">
               <div class="flex items-center justify-between">
                 <label class="block text-xs font-bold uppercase tracking-wider text-[#6B7280]">Password</label>
-                <a routerLink="/forgot-password" class="text-xs font-bold text-[#D4A359] hover:underline">
-                  Forgot password?
-                </a>
+                <span class="text-[11px] font-semibold text-[#D4A359]">
+                  Demo: <strong>123456</strong>
+                </span>
               </div>
               <div class="relative">
                 <app-icon name="shield" [size]="16" extraClass="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B7280]"></app-icon>
                 <input
                   type="password"
                   formControlName="password"
-                  placeholder="••••••••"
-                  class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#EFEDE7]/40 border border-[#0B1320]/10 text-sm focus:outline-none focus:border-[#D4A359]"
+                  placeholder="Enter 123456"
+                  class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#EFEDE7]/40 border border-[#0B1320]/10 text-sm focus:outline-none focus:border-[#D4A359] transition-all font-mono"
                 />
               </div>
               @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
@@ -179,7 +183,7 @@ export class LoginComponent implements OnInit {
 
   loginForm: FormGroup = this.fb.group({
     email: ['alex.mercer@tripsphere.travel', [Validators.required, Validators.email]],
-    password: ['password123', [Validators.required, Validators.minLength(6)]],
+    password: ['123456', [Validators.required, Validators.minLength(6)]],
     rememberMe: [true]
   });
 
@@ -198,14 +202,18 @@ export class LoginComponent implements OnInit {
       if (success) {
         this.router.navigateByUrl(this.returnUrl);
       } else {
-        this.errorMessage = 'Invalid email or password. Please try again or use 1-Click Demo Login.';
+        this.errorMessage = 'Incorrect password. Please enter the demo password: 123456';
       }
     }
   }
 
   onDemoLogin() {
     this.errorMessage = '';
-    this.authService.login('alex.mercer@tripsphere.travel', 'password123');
+    this.loginForm.patchValue({
+      email: 'alex.mercer@tripsphere.travel',
+      password: '123456'
+    });
+    this.authService.login('alex.mercer@tripsphere.travel', '123456');
     this.router.navigateByUrl(this.returnUrl);
   }
 }

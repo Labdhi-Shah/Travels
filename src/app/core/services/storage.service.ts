@@ -163,5 +163,34 @@ export class StorageService {
     if (!localStorage.getItem(this.PREFIX + 'settings')) {
       this.setItem('settings', DEFAULT_SETTINGS);
     }
+
+    // 15. tripsphere_login_session
+    if (!localStorage.getItem(this.PREFIX + 'login_session')) {
+      this.setItem('login_session', {
+        isLoggedIn: true,
+        email: MOCK_USERS[0].email,
+        userName: MOCK_USERS[0].fullName,
+        role: MOCK_USERS[0].role,
+        token: 'tripsphere_mock_session_token_123456',
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    // 16. tripsphere_confirmed_trips
+    if (!localStorage.getItem(this.PREFIX + 'confirmed_trips')) {
+      const confirmed = INITIAL_TRIPS.filter(t => t.status === 'Confirmed' || t.status === 'Upcoming');
+      this.setItem('confirmed_trips', confirmed);
+    }
+
+    // 17. tripsphere_preferences
+    if (!localStorage.getItem(this.PREFIX + 'preferences')) {
+      this.setItem('preferences', {
+        theme: 'Dark Ecru Editorial',
+        currency: 'USD ($)',
+        travelStyles: ['Relaxing', 'Culture', 'Luxury'],
+        defaultAdults: 2,
+        notificationsEnabled: true
+      });
+    }
   }
 }

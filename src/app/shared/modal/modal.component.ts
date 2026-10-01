@@ -15,13 +15,13 @@ import { LucideIconComponent } from '../icon/lucide-icon.component';
     >
       <!-- Backdrop -->
       <div
-        class="fixed inset-0 bg-[#0B1320]/70 backdrop-blur-sm transition-opacity"
+        class="fixed inset-0 bg-[#0B1320]/70 backdrop-blur-sm transition-opacity animate-modal-backdrop"
         (click)="closeModal()"
       ></div>
 
       <!-- Modal Card -->
       <div
-        class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10 border border-[#EFEDE7] animate-fade-in"
+        class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10 border border-[#EFEDE7] animate-modal-card"
         [ngClass]="maxWidthClass"
         (click)="$event.stopPropagation()"
       >

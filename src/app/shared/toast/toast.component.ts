@@ -11,7 +11,7 @@ import { LucideIconComponent } from '../icon/lucide-icon.component';
     <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0">
       @for (toast of toastService.toasts(); track toast.id) {
         <div
-          class="pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-2xl shadow-2xl border backdrop-blur-md transition-all duration-300 transform translate-y-0"
+          class="pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-2xl shadow-2xl border backdrop-blur-md transition-all duration-300 animate-toast-slide"
           [ngClass]="{
             'bg-[#0B1320]/95 border-emerald-500/40 text-white': toast.type === 'success',
             'bg-[#0B1320]/95 border-[#F4A261]/40 text-white': toast.type === 'warning',

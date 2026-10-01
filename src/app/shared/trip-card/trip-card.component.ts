@@ -9,12 +9,12 @@ import { Trip } from '../../models/trip.model';
   standalone: true,
   imports: [CommonModule, RouterLink, LucideIconComponent],
   template: `
-    <!-- Large Horizontal Editorial Trip Card (as requested in Section 19) -->
+    <!-- Large Horizontal Editorial Trip Card -->
     <div
-      class="group relative bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EFEDE7] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-stretch"
+      class="group relative bg-white rounded-3xl overflow-hidden border border-[#EFEDE7] hover:border-[#D4A359]/40 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-stretch"
     >
       <!-- Left/Top Large Travel Photography Container -->
-      <div class="relative w-full md:w-80 lg:w-96 min-h-[220px] md:min-h-full overflow-hidden shrink-0 bg-[#EFEDE7]">
+      <div class="relative w-full md:w-80 lg:w-[350px] min-h-[220px] md:min-h-full overflow-hidden shrink-0 bg-[#071F22]">
         <a [routerLink]="['/my-trips', trip.id]" class="block w-full h-full cursor-pointer">
           <img
             [src]="trip.coverImage"
@@ -23,132 +23,229 @@ import { Trip } from '../../models/trip.model';
             loading="lazy"
           />
         </a>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0B1320]/80 via-transparent to-black/30 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#071F22]/90 via-[#071F22]/30 to-transparent pointer-events-none"></div>
 
         <!-- Destination Tag Overlay -->
         <div class="absolute top-4 left-4 pointer-events-none">
-          <span class="px-3 py-1 rounded-md bg-[#0B1320]/80 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-md">
-            {{ trip.destination.split(',')[0] }}
+          <span class="px-3 py-1 rounded-full bg-[#071F22]/85 text-[#D4A359] text-xs font-bold uppercase tracking-wider backdrop-blur-md border border-white/10 shadow-sm flex items-center gap-1.5">
+            <app-icon name="map-pin" [size]="12"></app-icon>
+            <span>{{ trip.destination.split(',')[0] }}</span>
           </span>
         </div>
 
+        <!-- Trip Status Badge on Image -->
+        <div class="absolute top-4 right-4 pointer-events-none">
+          @if (trip.status === 'Confirmed') {
+            <span class="badge-status-confirmed shadow-md">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Confirmed
+            </span>
+          } @else if (trip.status === 'Pending') {
+            <span class="badge-status-pending shadow-md">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              Pending
+            </span>
+          } @else if (trip.status === 'Draft' || trip.status === 'Planned') {
+            <span class="badge-status-draft shadow-md">
+              Draft
+            </span>
+          } @else if (trip.status === 'Completed') {
+            <span class="badge-status-completed shadow-md">
+              Completed
+            </span>
+          } @else if (trip.status === 'Cancelled') {
+            <span class="badge-status-cancelled shadow-md">
+              Cancelled
+            </span>
+          } @else {
+            <span class="badge-status-upcoming shadow-md">
+              {{ trip.status }}
+            </span>
+          }
+        </div>
+
         <!-- Duration badge -->
-        <div class="absolute bottom-4 left-4 pointer-events-none">
-          <p class="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight uppercase">
+        <div class="absolute bottom-4 left-4 right-4 pointer-events-none">
+          <p class="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight">
             {{ trip.destination.split(',')[0] }}
           </p>
           <span class="text-xs font-semibold text-white/90 flex items-center gap-1.5 mt-0.5">
             <app-icon name="calendar" [size]="13" extraClass="text-[#D4A359]"></app-icon>
-            {{ calculateDurationDays() }} Days
+            <span>{{ trip.duration || (calculateDurationDays() + ' Days Expedition') }}</span>
           </span>
         </div>
       </div>
 
       <!-- Right/Body Content Container -->
-      <div class="p-6 sm:p-7 flex flex-col justify-between flex-1">
+      <div class="p-6 sm:p-7 flex flex-col justify-between flex-1 space-y-4">
         <div>
           <!-- Header Row -->
           <div class="flex items-start justify-between gap-4">
-            <div>
-              <span class="text-xs font-bold text-[#D4A359] uppercase tracking-wider">
-                {{ trip.country }}
-              </span>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-[#D4A359] uppercase tracking-wider">
+                  {{ trip.country }}
+                </span>
+                <span class="text-[#6B7280]">•</span>
+                
+                <!-- Unique Trip ID Tag -->
+                <span class="px-2.5 py-0.5 rounded-md bg-[#F8F7F3] text-[#071F22] font-mono text-[11px] font-bold border border-[#EFEDE7] flex items-center gap-1">
+                  <span>ID: {{ trip.id }}</span>
+                </span>
+              </div>
+
               <a [routerLink]="['/my-trips', trip.id]" class="block group-hover:text-[#D4A359] transition-colors cursor-pointer">
-                <h3 class="text-xl sm:text-2xl font-bold text-[#071F22] font-display mt-0.5">
+                <h3 class="text-xl sm:text-2xl font-bold text-[#071F22] font-display mt-0.5 leading-snug">
                   {{ trip.name }}
                 </h3>
               </a>
-              <p class="text-xs text-[#6B7280] mt-1 flex items-center gap-1.5">
-                <app-icon name="map-pin" [size]="13" extraClass="text-[#6B7280]"></app-icon>
-                <span>{{ trip.destination }}</span>
+              <div class="text-xs text-[#6B7280] flex items-center gap-2 flex-wrap mt-1">
+                <span class="flex items-center gap-1 font-semibold text-[#071F22]">
+                  <app-icon name="map-pin" [size]="13" extraClass="text-[#D4A359]"></app-icon>
+                  <strong>{{ trip.destination }}</strong>
+                </span>
                 <span>•</span>
-                <span>{{ trip.startDate | date: 'mediumDate' }} – {{ trip.endDate | date: 'mediumDate' }}</span>
-              </p>
+                <span class="flex items-center gap-1">
+                  <app-icon name="calendar" [size]="13"></app-icon>
+                  <span>{{ trip.startDate | date: 'mediumDate' }} – {{ trip.endDate | date: 'mediumDate' }}</span>
+                </span>
+                <span>•</span>
+                <span class="text-[#071F22] font-semibold">{{ trip.duration || (calculateDurationDays() + ' Days') }}</span>
+              </div>
             </div>
 
-            <!-- Quick Edit / Delete -->
+            <!-- Quick Action Icons -->
             <div class="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 (click)="onEdit.emit(trip)"
-                class="w-8 h-8 rounded-full bg-[#EFEDE7]/70 hover:bg-[#EFEDE7] text-[#17202A] flex items-center justify-center transition-colors cursor-pointer"
+                class="w-8 h-8 rounded-full bg-[#F8F7F3] hover:bg-[#EFEDE7] text-[#17202A] flex items-center justify-center transition-colors cursor-pointer btn-interaction"
                 title="Edit Trip Details"
+                aria-label="Edit Trip Details"
               >
                 <app-icon name="edit" [size]="14"></app-icon>
               </button>
               <button
                 type="button"
                 (click)="onDelete.emit(trip)"
-                class="w-8 h-8 rounded-full bg-[#EFEDE7]/70 hover:bg-rose-50 text-[#17202A] hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
+                class="w-8 h-8 rounded-full bg-[#F8F7F3] hover:bg-rose-50 text-[#17202A] hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer btn-interaction"
                 title="Delete Trip"
+                aria-label="Delete Trip"
               >
                 <app-icon name="trash-2" [size]="14"></app-icon>
               </button>
             </div>
           </div>
 
-          <!-- Notes / Destinations -->
-          @if (trip.notes) {
-            <p class="text-xs text-[#6B7280] mt-3 line-clamp-2 leading-relaxed">
-              {{ trip.notes }}
-            </p>
+          <!-- Trip Specifications Grid: Hotel, Flight, Travelers, Rooms, Budget -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 text-xs">
+            <div class="p-3 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7] flex flex-col justify-between">
+              <span class="text-[10px] uppercase font-bold text-[#6B7280] flex items-center gap-1.5">
+                <app-icon name="hotel" [size]="13" extraClass="text-[#D4A359]"></app-icon>
+                <span>Hotel Stay</span>
+              </span>
+              <span class="font-bold text-[#071F22] truncate block mt-1" [title]="trip.hotelName || 'Curated Resort'">
+                {{ trip.hotelName || 'Curated Luxury Resort' }}
+              </span>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7] flex flex-col justify-between">
+              <span class="text-[10px] uppercase font-bold text-[#6B7280] flex items-center gap-1.5">
+                <app-icon name="plane" [size]="13" extraClass="text-[#38BDF8]"></app-icon>
+                <span>Flight</span>
+              </span>
+              <span class="font-bold text-[#071F22] truncate block mt-1" [title]="trip.flight || 'Economy Flight'">
+                {{ trip.flight || 'Economy Flight' }}
+              </span>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7] flex flex-col justify-between">
+              <span class="text-[10px] uppercase font-bold text-[#6B7280] flex items-center gap-1.5">
+                <app-icon name="user" [size]="13" extraClass="text-[#0A2D30]"></app-icon>
+                <span>Travelers & Rooms</span>
+              </span>
+              <span class="font-bold text-[#071F22] block mt-1">
+                {{ trip.travelers.adults }} Adults{{ trip.travelers.children ? ', ' + trip.travelers.children + ' Kids' : '' }} • {{ trip.rooms || 1 }} {{ (trip.rooms || 1) === 1 ? 'Room' : 'Rooms' }}
+              </span>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7] flex flex-col justify-between">
+              <span class="text-[10px] uppercase font-bold text-[#6B7280] flex items-center gap-1.5">
+                <app-icon name="dollar-sign" [size]="13" extraClass="text-emerald-600"></app-icon>
+                <span>Total Budget</span>
+              </span>
+              <span class="font-bold text-emerald-700 block text-sm font-display mt-0.5">
+                \${{ trip.budget | number }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Activities Badges -->
+          @if (trip.activities && trip.activities.length > 0) {
+            <div class="mt-3.5 flex items-center gap-1.5 flex-wrap">
+              <span class="text-[10px] uppercase font-bold text-[#6B7280] mr-1">Activities:</span>
+              @for (act of trip.activities; track act) {
+                <span class="px-2.5 py-0.5 rounded-lg bg-[#F8F7F3] border border-[#EFEDE7] text-[11px] font-semibold text-[#071F22]">
+                  {{ act }}
+                </span>
+              }
+            </div>
           }
 
           <!-- Planned Progress Bar -->
-          <div class="mt-5 p-4 rounded-xl bg-[#EFEDE7]/40 border border-[#EFEDE7]">
+          <div class="mt-4 p-3 rounded-xl bg-[#F8F7F3] border border-[#EFEDE7]">
             <div class="flex items-center justify-between text-xs mb-1.5">
-              <span class="font-bold text-[#071F22]">Itinerary Progress</span>
+              <span class="font-bold text-[#071F22]">Itinerary Readiness</span>
               <span class="font-bold text-[#D4A359]">{{ plannedProgress }}% planned</span>
             </div>
-            <div class="w-full h-2 bg-[#EFEDE7] rounded-full overflow-hidden">
+            <div class="w-full h-1.5 bg-[#EFEDE7] rounded-full overflow-hidden">
               <div
-                class="h-full bg-[#D4A359] rounded-full transition-all duration-700"
+                class="h-full bg-gradient-to-r from-[#0A2D30] to-[#D4A359] rounded-full transition-all duration-700"
                 [style.width.%]="plannedProgress"
               ></div>
             </div>
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="mt-6 pt-4 border-t border-[#EFEDE7] flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3 text-xs text-[#6B7280]">
-            <span class="flex items-center gap-1">
-              <app-icon name="users" [size]="13"></app-icon>
-              {{ trip.travelers.adults }} Adults<span *ngIf="trip.travelers.children">, {{ trip.travelers.children }} Kids</span>
-            </span>
-            <span>•</span>
-            <span class="font-semibold text-[#071F22]">
-              Budget: \${{ trip.budget | number }}
+        <!-- Action Buttons (View Trip, View Itinerary, Edit, Delete) -->
+        <div class="pt-4 border-t border-[#EFEDE7] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2 text-xs text-[#6B7280]">
+            <span class="font-mono text-[11px] bg-slate-100 px-2 py-0.5 rounded">
+              Ref: {{ trip.id }}
             </span>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="grid grid-cols-2 sm:flex sm:items-center gap-2">
             <a
               [routerLink]="['/my-trips', trip.id]"
-              class="px-3.5 py-1.5 rounded-xl bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#0A2D30] text-xs font-bold text-white transition-colors shadow-sm"
+              class="px-4 py-2.5 rounded-xl bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-xs font-bold text-white transition-all shadow-sm active:scale-95 btn-interaction inline-flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              View Trip
+              <app-icon name="compass" [size]="14"></app-icon>
+              <span>View Trip</span>
             </a>
             <a
               [routerLink]="['/itinerary']"
               [queryParams]="{ tripId: trip.id }"
-              class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0A2D30] hover:text-white text-xs font-bold text-[#071F22] transition-colors cursor-pointer"
+              class="px-4 py-2.5 rounded-xl bg-[#F8F7F3] hover:bg-[#0A2D30] hover:text-white border border-[#EFEDE7] text-xs font-bold text-[#071F22] transition-all active:scale-95 btn-interaction inline-flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              View Itinerary
+              <app-icon name="calendar" [size]="14"></app-icon>
+              <span>View Itinerary</span>
             </a>
             <button
               type="button"
               (click)="onEdit.emit(trip)"
-              class="px-3.5 py-1.5 rounded-xl border border-[#0B1320]/15 hover:bg-[#EFEDE7] text-xs font-bold text-[#0B1320] transition-colors cursor-pointer"
+              class="px-3.5 py-2.5 rounded-xl border border-[#EFEDE7] hover:bg-[#F8F7F3] text-xs font-bold text-[#071F22] transition-all active:scale-95 btn-interaction inline-flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              Edit Trip
+              <app-icon name="edit" [size]="14"></app-icon>
+              <span>Edit</span>
             </button>
             <button
               type="button"
               (click)="onDelete.emit(trip)"
-              class="px-3.5 py-1.5 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold transition-colors cursor-pointer"
+              class="px-3.5 py-2.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-all active:scale-95 btn-interaction inline-flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              Delete Trip
+              <app-icon name="trash-2" [size]="14"></app-icon>
+              <span>Delete</span>
             </button>
           </div>
         </div>
@@ -163,6 +260,7 @@ export class TripCardComponent {
 
   get plannedProgress(): number {
     if (this.trip.status === 'Completed') return 100;
+    if (this.trip.status === 'Confirmed') return 90;
     if (this.trip.name.toLowerCase().includes('goa')) return 65;
     if (this.trip.budget > 0) {
       const ratio = Math.round((this.trip.spent / this.trip.budget) * 100);

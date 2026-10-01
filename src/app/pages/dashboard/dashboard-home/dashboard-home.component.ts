@@ -1,18 +1,20 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
+import { TripCardComponent } from '../../../shared/trip-card/trip-card.component';
 import { TripService } from '../../../core/services/trip.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { BookingService } from '../../../core/services/booking.service';
 import { FavoriteService } from '../../../core/services/favorite.service';
 import { BudgetService } from '../../../core/services/budget.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Trip } from '../../../models/trip.model';
 
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideIconComponent],
+  imports: [CommonModule, RouterLink, LucideIconComponent, TripCardComponent],
   template: `
     <div class="space-y-8 animate-fade-in pb-16 pt-2 sm:pt-4 text-[#17202A]">
       
@@ -61,9 +63,14 @@ import { Trip } from '../../../models/trip.model';
 
         <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
           <div class="space-y-4 max-w-xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#D4A359] text-xs font-bold uppercase tracking-widest backdrop-blur-md border border-white/10">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-pulse"></span>
-              UPCOMING DEPARTURE
+            <div class="flex items-center gap-2 flex-wrap">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#D4A359] text-xs font-bold uppercase tracking-widest backdrop-blur-md border border-white/10">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-pulse"></span>
+                {{ upcomingTrip?.status || 'Confirmed' }} DEPARTURE
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full bg-white/10 text-white font-mono text-xs font-semibold border border-white/10">
+                ID: {{ upcomingTrip?.id || 'TS-2026-GOA01' }}
+              </span>
             </div>
 
             <div>
@@ -93,7 +100,12 @@ import { Trip } from '../../../models/trip.model';
               <span>&bull;</span>
               <span class="flex items-center gap-1.5 text-emerald-400 font-semibold">
                 <app-icon name="check-circle" [size]="15"></app-icon>
-                <span>Confirmed Stay</span>
+                <span>{{ upcomingTrip?.hotelName || 'Taj Exotica Resort & Spa' }}</span>
+              </span>
+              <span>&bull;</span>
+              <span class="flex items-center gap-1.5 text-[#38BDF8] font-medium">
+                <app-icon name="plane" [size]="15"></app-icon>
+                <span>{{ upcomingTrip?.flight || 'IndiGo 6E-204' }}</span>
               </span>
             </div>
 
@@ -248,55 +260,93 @@ import { Trip } from '../../../models/trip.model';
         </div>
       </div>
 
-      <!-- RECENT JOURNEYS SHOWCASE -->
-      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-[#EFEDE7] shadow-sm space-y-5">
-        <div class="flex items-center justify-between pb-3 border-b border-[#EFEDE7]">
+      <!-- EXPEDITIONS & CONFIRMED TRIPS SHOWCASE (Requirements 5, 6, 7) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-[#EFEDE7] shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EFEDE7]">
           <div>
             <span class="text-[10px] font-bold uppercase tracking-widest text-[#D4A359]">
               WORKSPACE DISPATCHES
             </span>
-            <h3 class="text-xl font-bold font-display text-[#071F22]">
-              Recent Journeys & Itineraries
+            <h3 class="text-xl sm:text-2xl font-bold font-display text-[#071F22] mt-0.5">
+              Trip Hub & Itineraries
             </h3>
+            <p class="text-xs text-[#6B7280] font-light">
+              Live synchronized journeys across User & Admin panels with status tracking and full details.
+            </p>
           </div>
-          <a routerLink="/my-trips" class="text-xs font-bold text-[#D4A359] hover:underline flex items-center gap-1">
-            <span>View All Trips</span>
-            <app-icon name="arrow-right" [size]="14"></app-icon>
-          </a>
+
+          <!-- Tabs: Confirmed Trips | Upcoming Trips | Recent Trips -->
+          <div class="flex items-center gap-2 bg-[#F8F7F3] p-1.5 rounded-2xl border border-[#EFEDE7] overflow-x-auto no-scrollbar shrink-0">
+            <button
+              type="button"
+              (click)="activeTripsTab = 'confirmed'"
+              class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+              [ngClass]="activeTripsTab === 'confirmed'
+                ? 'bg-[#0A2D30] text-[#D4A359] shadow-sm'
+                : 'text-[#071F22] hover:bg-[#EFEDE7]'"
+            >
+              <app-icon name="check-circle" [size]="13"></app-icon>
+              <span>Confirmed Trips</span>
+              <span class="px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">{{ confirmedTrips.length }}</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="activeTripsTab = 'upcoming'"
+              class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+              [ngClass]="activeTripsTab === 'upcoming'
+                ? 'bg-[#0A2D30] text-[#D4A359] shadow-sm'
+                : 'text-[#071F22] hover:bg-[#EFEDE7]'"
+            >
+              <app-icon name="calendar" [size]="13"></app-icon>
+              <span>Upcoming Trips</span>
+              <span class="px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">{{ upcomingTrips.length }}</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="activeTripsTab = 'recent'"
+              class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+              [ngClass]="activeTripsTab === 'recent'
+                ? 'bg-[#0A2D30] text-[#D4A359] shadow-sm'
+                : 'text-[#071F22] hover:bg-[#EFEDE7]'"
+            >
+              <app-icon name="clock" [size]="13"></app-icon>
+              <span>Recent Trips</span>
+              <span class="px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">{{ recentTrips.length }}</span>
+            </button>
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          @for (trip of recentTrips; track trip.id) {
-            <div class="p-4 rounded-2xl border border-[#EFEDE7] bg-[#F8F7F3]/40 hover:border-[#D4A359]/50 transition-all space-y-3 group flex flex-col justify-between">
-              <div>
-                <a [routerLink]="['/my-trips', trip.id]" class="block relative h-36 rounded-xl overflow-hidden cursor-pointer">
-                  <img
-                    [src]="trip.coverImage"
-                    [alt]="trip.name"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-[#071F22]/80 backdrop-blur-sm text-white text-[10px] font-bold">
-                    {{ trip.status }} &bull; {{ trip.progress }}%
-                  </span>
-                </a>
-                <div class="mt-3">
-                  <a [routerLink]="['/my-trips', trip.id]" class="hover:text-[#D4A359] transition-colors cursor-pointer">
-                    <h4 class="text-base font-bold text-[#071F22]">{{ trip.name }}</h4>
-                  </a>
-                  <p class="text-xs text-[#6B7280] mt-0.5">{{ trip.startDate }} &bull; {{ trip.destination }}</p>
-                </div>
-              </div>
-
-              <div class="pt-2 border-t border-[#EFEDE7] flex items-center justify-between text-xs mt-2">
-                <span class="font-bold text-[#071F22]">\${{ trip.spent || trip.budget | number }} spent</span>
-                <a [routerLink]="['/my-trips', trip.id]" class="text-xs font-bold text-[#D4A359] hover:underline flex items-center gap-1 cursor-pointer">
-                  <span>Inspect</span>
-                  <span>&rarr;</span>
-                </a>
-              </div>
+        <!-- Render List of Trip Cards with all 13 fields -->
+        @if (displayedTrips.length > 0) {
+          <div class="space-y-5">
+            @for (trip of displayedTrips; track trip.id) {
+              <app-trip-card
+                [trip]="trip"
+                (onEdit)="onEditTrip(trip)"
+                (onDelete)="onDeleteTrip(trip)"
+              ></app-trip-card>
+            }
+          </div>
+        } @else {
+          <div class="py-12 px-4 text-center rounded-2xl bg-[#F8F7F3]/60 border border-dashed border-[#EFEDE7] space-y-3">
+            <div class="w-12 h-12 rounded-full bg-[#D4A359]/20 text-[#D4A359] flex items-center justify-center mx-auto">
+              <app-icon name="map" [size]="22"></app-icon>
             </div>
-          }
-        </div>
+            <h4 class="text-base font-bold text-[#071F22]">No journeys found in this section</h4>
+            <p class="text-xs text-[#6B7280] max-w-sm mx-auto">
+              Plan and confirm an expedition to see your personalized itinerary, flight, and hotel vouchers appear here.
+            </p>
+            <a
+              routerLink="/plan-trip"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+            >
+              <app-icon name="plus" [size]="14"></app-icon>
+              <span>Plan My Trip</span>
+            </a>
+          </div>
+        }
       </div>
 
       <!-- DASHBOARD MAIN WORKSPACE GRID -->
@@ -604,12 +654,44 @@ export class DashboardHomeComponent {
   bookingService = inject(BookingService);
   favoriteService = inject(FavoriteService);
   budgetService = inject(BudgetService);
+  toastService = inject(ToastService);
+  router = inject(Router);
+
+  activeTripsTab: 'confirmed' | 'upcoming' | 'recent' = 'confirmed';
 
   get upcomingTrip(): Trip | undefined {
-    return this.tripService.trips()[0];
+    const confirmed = this.tripService.getConfirmedTrips();
+    if (confirmed.length > 0) return confirmed[0];
+    const all = this.tripService.trips();
+    return all.find(t => t.status === 'Confirmed' || t.status === 'Upcoming') || all[0];
+  }
+
+  get confirmedTrips(): Trip[] {
+    return this.tripService.getConfirmedTrips();
+  }
+
+  get upcomingTrips(): Trip[] {
+    return this.tripService.getUpcomingTrips();
   }
 
   get recentTrips(): Trip[] {
-    return this.tripService.trips().slice(0, 3);
+    return this.tripService.getRecentTrips(6);
+  }
+
+  get displayedTrips(): Trip[] {
+    if (this.activeTripsTab === 'confirmed') return this.confirmedTrips;
+    if (this.activeTripsTab === 'upcoming') return this.upcomingTrips;
+    return this.recentTrips;
+  }
+
+  onEditTrip(trip: Trip): void {
+    this.router.navigate(['/my-trips']);
+  }
+
+  onDeleteTrip(trip: Trip): void {
+    if (confirm(`Are you sure you want to delete "${trip.name}"?`)) {
+      this.tripService.deleteTrip(trip.id);
+      this.toastService.success('Trip removed from your dashboard');
+    }
   }
 }

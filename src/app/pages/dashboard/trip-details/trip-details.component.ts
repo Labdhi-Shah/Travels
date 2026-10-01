@@ -40,8 +40,20 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
                 <app-icon name="arrow-left" [size]="12"></app-icon>
                 <span>Back to Trips</span>
               </a>
-              <span class="px-3.5 py-1 rounded-full bg-emerald-600/90 text-white text-xs font-semibold uppercase tracking-wider">
+              <span class="px-3.5 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider backdrop-blur-md"
+                [ngClass]="{
+                  'bg-emerald-600/90': trip.status === 'Confirmed',
+                  'bg-amber-600/90': trip.status === 'Pending',
+                  'bg-slate-600/90': trip.status === 'Draft',
+                  'bg-blue-600/90': trip.status === 'Upcoming' || trip.status === 'Ongoing',
+                  'bg-purple-600/90': trip.status === 'Completed',
+                  'bg-rose-600/90': trip.status === 'Cancelled'
+                }"
+              >
                 {{ trip.status }}
+              </span>
+              <span class="px-3 py-1 rounded-full bg-white/10 text-white font-mono text-xs font-semibold backdrop-blur-md border border-white/10">
+                ID: {{ trip.id }}
               </span>
               <button
                 type="button"
@@ -57,12 +69,35 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
 
             <h1 class="text-3xl sm:text-5xl font-serif font-bold text-white tracking-tight">{{ trip.name }}</h1>
             
-            <p class="text-xs sm:text-sm text-[#38BDF8] font-medium flex items-center gap-2">
-              <app-icon name="calendar" [size]="14"></app-icon>
-              <span>{{ trip.startDate | date: 'mediumDate' }} – {{ trip.endDate | date: 'mediumDate' }}</span>
+            <div class="flex items-center gap-3 text-xs sm:text-sm text-[#38BDF8] font-medium flex-wrap">
+              <span class="flex items-center gap-1.5">
+                <app-icon name="calendar" [size]="14"></app-icon>
+                <span>{{ trip.startDate | date: 'mediumDate' }} – {{ trip.endDate | date: 'mediumDate' }}</span>
+              </span>
               <span class="text-white/40">•</span>
-              <span>{{ trip.travelers.adults }} Adults</span>
-            </p>
+              <span>{{ trip.duration || '07 Days' }}</span>
+              <span class="text-white/40">•</span>
+              <span>{{ trip.travelers.adults }} Adults{{ trip.travelers.children ? ', ' + trip.travelers.children + ' Kids' : '' }}</span>
+              <span class="text-white/40">•</span>
+              <span>{{ trip.rooms || 1 }} {{ (trip.rooms || 1) === 1 ? 'Room' : 'Rooms' }}</span>
+            </div>
+
+            @if (trip.hotelName || trip.flight) {
+              <div class="flex items-center gap-3 text-xs text-white/90 flex-wrap pt-0.5">
+                @if (trip.hotelName) {
+                  <span class="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-full">
+                    <app-icon name="hotel" [size]="12" extraClass="text-[#D4A359]"></app-icon>
+                    <span>{{ trip.hotelName }}</span>
+                  </span>
+                }
+                @if (trip.flight) {
+                  <span class="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-full">
+                    <app-icon name="plane" [size]="12" extraClass="text-[#38BDF8]"></app-icon>
+                    <span>{{ trip.flight }}</span>
+                  </span>
+                }
+              </div>
+            }
 
             <!-- Route chips -->
             <div *ngIf="trip.destinationsList?.length" class="flex items-center gap-1.5 text-xs text-white/90 flex-wrap pt-1">
@@ -153,6 +188,81 @@ import { BudgetCategorySummary } from '../../../models/expense.model';
             <p class="text-2xl font-serif font-bold text-[#0084FF] mt-1">21°C</p>
             <p class="text-[11px] text-[#6B7280] mt-0.5">Sunny & Clear Sky</p>
           </div>
+        </div>
+
+        <!-- Confirmed Expedition Dossier Specifications (Requirement 5) -->
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-[#D4A359]">CONFIRMED EXPEDITION DOSSIER</span>
+              <h3 class="text-lg font-bold font-display text-[#071328]">Journey Specifications</h3>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-slate-100 text-[#071328] font-mono text-xs font-bold">
+              ID: {{ trip.id }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280]">Destination</span>
+              <p class="font-bold text-[#071328] text-sm">{{ trip.destination }}, {{ trip.country }}</p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280]">Travel Dates & Duration</span>
+              <p class="font-bold text-[#071328] text-sm">{{ trip.startDate | date: 'mediumDate' }} – {{ trip.endDate | date: 'mediumDate' }} ({{ trip.duration || '07 Days' }})</p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280]">Travelers & Rooms</span>
+              <p class="font-bold text-[#071328] text-sm">{{ trip.travelers.adults }} Adults{{ trip.travelers.children ? ', ' + trip.travelers.children + ' Kids' : '' }} • {{ trip.rooms || 1 }} Room(s)</p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280]">Budget & Status</span>
+              <p class="font-bold text-emerald-700 text-sm font-display">\${{ trip.budget | number }} ({{ trip.status }})</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-1">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280]">Accommodations</span>
+              <p class="font-bold text-[#071328] flex items-center gap-1.5 text-sm">
+                <app-icon name="hotel" [size]="14" extraClass="text-[#D4A359]"></app-icon>
+                <span>{{ trip.hotelName || 'Curated Boutique Resort' }}</span>
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280]">Flight Option</span>
+              <p class="font-bold text-[#071328] flex items-center gap-1.5 text-sm">
+                <app-icon name="plane" [size]="14" extraClass="text-[#0084FF]"></app-icon>
+                <span>{{ trip.flight || 'Economy Flight' }}</span>
+              </p>
+            </div>
+          </div>
+
+          @if (trip.activities && trip.activities.length > 0) {
+            <div class="pt-2">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280] block mb-1.5">Scheduled Activities</span>
+              <div class="flex flex-wrap gap-1.5">
+                @for (act of trip.activities; track act) {
+                  <span class="px-3 py-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-[#071328]">
+                    {{ act }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+          @if (trip.additionalPreferences) {
+            <div class="pt-2 border-t border-slate-100">
+              <span class="text-[10px] font-bold uppercase text-[#6B7280] block mb-1">Additional Preferences & Special Requests</span>
+              <p class="text-xs text-[#071328] font-medium bg-amber-50/60 p-3 rounded-xl border border-amber-100">
+                {{ trip.additionalPreferences }}
+              </p>
+            </div>
+          }
         </div>
 
         <!-- Notes Card -->

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideIconComponent } from '../../../shared/icon/lucide-icon.component';
 import { TripService } from '../../../core/services/trip.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -10,6 +10,7 @@ import { HotelService } from '../../../core/services/hotel.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Destination } from '../../../models/destination.model';
 import { Hotel } from '../../../models/hotel.model';
+import { Trip } from '../../../models/trip.model';
 
 interface StepInfo {
   num: number;
@@ -20,7 +21,7 @@ interface StepInfo {
 @Component({
   selector: 'app-create-trip',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, LucideIconComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, LucideIconComponent],
   template: `
     <div class="max-w-5xl mx-auto py-6 sm:py-10 px-4 space-y-8 animate-fade-in text-[#17202A]">
       
@@ -494,73 +495,178 @@ interface StepInfo {
         }
 
         <!-- ============================================== -->
-        <!-- STEP 8: REVIEW & SAVE                          -->
+        <!-- STEP 8: REVIEW & CONFIRM                       -->
         <!-- ============================================== -->
         @if (currentStep === 8) {
-          <div class="space-y-8 max-w-2xl mx-auto py-4 w-full">
+          <div class="space-y-8 max-w-3xl mx-auto py-2 w-full animate-step-transition">
             <div class="text-center space-y-1">
-              <span class="text-[10px] font-bold uppercase tracking-widest text-[#D4A359]">Step 08 &bull; FINAL BLUEPRINT</span>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-[#D4A359]">Step 08 &bull; FINAL BLUEPRINT & VERIFICATION</span>
               <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#071F22]">Review Your Journey</h2>
-              <p class="text-xs sm:text-sm text-[#6B7280]">Review your specifications before saving to your workspace.</p>
+              <p class="text-xs sm:text-sm text-[#6B7280]">Fine-tune additional preferences, inspect your travel dossier, and confirm your booking.</p>
             </div>
 
-            <!-- DOSSIER CARD -->
-            <div class="bg-[#F8F7F3] rounded-3xl p-6 sm:p-8 border border-[#EFEDE7] space-y-6 shadow-sm">
-              <div class="flex items-center gap-4">
-                <img [src]="selectedDestination?.image" [alt]="selectedDestination?.name" class="w-24 h-24 rounded-2xl object-cover shrink-0 shadow-md ring-2 ring-[#D4A359]/30" />
+            <!-- 11. ADDITIONAL PREFERENCES (Requirement 4) -->
+            <div class="bg-[#F8F7F3] rounded-3xl p-6 sm:p-7 border border-[#EFEDE7] space-y-4 shadow-sm">
+              <div class="flex items-center justify-between">
                 <div>
-                  <span class="text-[10px] font-bold uppercase tracking-widest text-[#D4A359]">{{ selectedDestination?.country }}</span>
-                  <h3 class="text-2xl font-bold font-display text-[#071F22]">{{ selectedDestination?.name }} Escape</h3>
-                  <p class="text-xs text-[#6B7280] mt-0.5">{{ startDate }} &ndash; {{ endDate }} &bull; {{ getDurationText() }}</p>
+                  <span class="text-[10px] font-bold uppercase tracking-widest text-[#D4A359]">Bespoke Touches</span>
+                  <h3 class="text-lg sm:text-xl font-bold font-display text-[#071F22]">Additional Preferences</h3>
+                  <p class="text-xs text-[#6B7280]">Select special arrangements to customize your travel package.</p>
                 </div>
+                <span class="text-xs font-bold text-[#D4A359] hidden sm:block">{{ selectedPreferences.length }} Selected</span>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#EFEDE7] text-xs">
-                <div>
-                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Travelers & Rooms</span>
-                  <span class="font-bold text-[#071F22] text-sm">{{ adultsCount }} Adults, {{ kidsCount }} Kids &bull; {{ roomsCount }} {{ roomsCount === 1 ? 'Room' : 'Rooms' }}</span>
-                </div>
-                <div>
-                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Budget & Flight</span>
-                  <span class="font-bold text-[#071F22] text-sm">{{ selectedBudget }} &bull; {{ selectedFlight }}</span>
-                </div>
-                <div>
-                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Travel Style</span>
-                  <span class="font-bold text-[#071F22] text-sm">{{ selectedStyle }}</span>
-                </div>
-                <div>
-                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px]">Sanctuary Stay</span>
-                  <span class="font-bold text-[#071F22] text-sm truncate block">{{ selectedHotel?.name }}</span>
-                </div>
+              <!-- Interactive Preference Choice Chips -->
+              <div class="flex flex-wrap gap-2">
+                @for (pref of additionalPreferencesOptions; track pref) {
+                  <button
+                    type="button"
+                    (click)="togglePreference(pref)"
+                    class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 btn-interaction"
+                    [ngClass]="selectedPreferences.includes(pref)
+                      ? 'bg-[#0A2D30] text-[#D4A359] border border-[#D4A359]/40 shadow-sm'
+                      : 'bg-white text-[#071F22] border border-[#EFEDE7] hover:border-[#D4A359]/40'"
+                  >
+                    <span>{{ pref }}</span>
+                    @if (selectedPreferences.includes(pref)) {
+                      <span class="text-[#D4A359] font-bold">✓</span>
+                    } @else {
+                      <span class="text-[#6B7280] font-bold">+</span>
+                    }
+                  </button>
+                }
               </div>
 
-              <div class="pt-4 border-t border-[#EFEDE7]">
-                <span class="text-[#6B7280] block uppercase tracking-wider text-[10px] mb-2 font-bold">Planned Experiences:</span>
-                <div class="flex flex-wrap gap-2">
-                  @for (act of selectedActivities; track act) {
-                    <span class="px-3 py-1 rounded-full bg-white border border-[#EFEDE7] text-xs font-semibold text-[#071F22]">
-                      {{ act }}
+              <!-- Special Requests Notes -->
+              <div class="pt-2">
+                <label class="block text-xs font-bold uppercase text-[#6B7280] mb-1.5">Special Requests or Dietary Requirements (Optional)</label>
+                <textarea
+                  [(ngModel)]="specialRequests"
+                  rows="2"
+                  placeholder="e.g., Vegetarian or Halal dining, high-floor ocean view, quiet room, late check-in..."
+                  class="w-full px-4 py-2.5 rounded-xl bg-white border border-[#EFEDE7] text-xs font-medium focus:outline-none focus:border-[#D4A359] form-field-animated"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- PROPER TRIP SUMMARY DOSSIER (Requirement 4) -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#D4A359]/35 space-y-6 shadow-xl relative overflow-hidden">
+              <!-- Top Destination Banner -->
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-[#EFEDE7]">
+                <div class="flex items-center gap-4">
+                  <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 shadow-md ring-2 ring-[#D4A359]/40 img-zoom-wrapper">
+                    <img [src]="selectedDestination?.image" [alt]="selectedDestination?.name" class="w-full h-full object-cover img-zoom" />
+                  </div>
+                  <div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#0A2D30] text-[#D4A359] text-[10px] font-bold uppercase tracking-wider">
+                      {{ selectedDestination?.country || 'Global Destination' }}
                     </span>
-                  }
+                    <h3 class="text-2xl sm:text-3xl font-bold font-display text-[#071F22] mt-1">
+                      {{ selectedDestination?.name || 'Selected' }} Journey
+                    </h3>
+                    <p class="text-xs text-[#6B7280] mt-0.5 flex items-center gap-1.5">
+                      <app-icon name="calendar" [size]="13" extraClass="text-[#D4A359]"></app-icon>
+                      <span>{{ startDate }} &ndash; {{ endDate }}</span>
+                      <span>&bull;</span>
+                      <strong class="text-[#071F22]">{{ getDurationText() }}</strong>
+                    </p>
+                  </div>
                 </div>
+
+                <div class="text-right sm:self-center shrink-0">
+                  <span class="text-[10px] uppercase font-bold text-[#6B7280] tracking-wider block">Estimated Budget</span>
+                  <span class="text-2xl sm:text-3xl font-bold font-display text-emerald-700">\${{ getEstimatedTotalBudget() | number }}</span>
+                  <span class="text-[11px] text-[#D4A359] font-bold block">{{ selectedBudget }} Tier Scale</span>
+                </div>
+              </div>
+
+              <!-- 4-Col Grid of All 11 Parameters -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
+                <div class="p-3.5 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7]">
+                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px] font-bold">Party & Rooms</span>
+                  <span class="font-bold text-[#071F22] text-sm mt-0.5 block">{{ adultsCount }} Adults, {{ kidsCount }} Kids</span>
+                  <span class="text-[11px] text-[#6B7280]">{{ roomsCount }} {{ roomsCount === 1 ? 'Private Room' : 'Private Rooms' }}</span>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7]">
+                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px] font-bold">Sanctuary Stay</span>
+                  <span class="font-bold text-[#071F22] text-sm mt-0.5 block truncate" [title]="selectedHotel?.name">{{ selectedHotel?.name }}</span>
+                  <span class="text-[11px] text-[#D4A359] font-bold">{{ selectedHotel?.rating }}★ Hotel Rating</span>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7]">
+                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px] font-bold">Air Transit</span>
+                  <span class="font-bold text-[#071F22] text-sm mt-0.5 block">{{ selectedFlight }}</span>
+                  <span class="text-[11px] text-[#6B7280]">Flight Included</span>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7]">
+                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px] font-bold">Travel Style</span>
+                  <span class="font-bold text-[#071F22] text-sm mt-0.5 block">{{ selectedStyle }}</span>
+                  <span class="text-[11px] text-[#6B7280]">Curated Atmosphere</span>
+                </div>
+              </div>
+
+              <!-- Included Activities & Additional Preferences -->
+              <div class="space-y-3 pt-3 border-t border-[#EFEDE7]">
+                <div>
+                  <span class="text-[#6B7280] block uppercase tracking-wider text-[10px] mb-1.5 font-bold">Included Activities ({{ selectedActivities.length }}):</span>
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (act of selectedActivities; track act) {
+                      <span class="px-3 py-1 rounded-full bg-[#F8F7F3] border border-[#EFEDE7] text-xs font-semibold text-[#071F22]">
+                        {{ act }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                @if (selectedPreferences.length > 0) {
+                  <div>
+                    <span class="text-[#6B7280] block uppercase tracking-wider text-[10px] mb-1.5 font-bold">Additional Preferences:</span>
+                    <div class="flex flex-wrap gap-1.5">
+                      @for (p of selectedPreferences; track p) {
+                        <span class="px-3 py-1 rounded-full bg-[#D4A359]/15 text-[#8C6320] text-xs font-bold border border-[#D4A359]/25">
+                          ✓ {{ p }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (specialRequests) {
+                  <p class="text-xs text-[#6B7280] italic bg-[#F8F7F3] p-2.5 rounded-xl border border-[#EFEDE7]">
+                    Special Note: "{{ specialRequests }}"
+                  </p>
+                }
+              </div>
+
+              <!-- Status Preview Banner -->
+              <div class="p-3.5 rounded-2xl bg-[#ECFDF5] border border-emerald-300 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2 text-emerald-800 font-bold">
+                  <app-icon name="check-circle" [size]="16" extraClass="text-emerald-600 shrink-0"></app-icon>
+                  <span>Ready for instant confirmation. Click below to confirm and finalize your trip!</span>
+                </div>
+                <span class="badge-status-pending shrink-0">Pending Confirmation</span>
               </div>
             </div>
 
-            <!-- Action Buttons: Create Trip, Save Draft, Clear Form -->
-            <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <!-- ACTION BUTTONS: CLEAR "CONFIRM TRIP" BUTTON (Requirement 4) -->
+            <div class="flex flex-wrap items-center justify-center gap-3 pt-4">
               <button
                 type="button"
-                (click)="createMyTrip()"
-                class="px-8 py-3.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-xl hover:shadow-2xl transition-all active:scale-95 cursor-pointer"
+                id="btn-confirm-trip-main"
+                (click)="onConfirmTripClick()"
+                class="px-10 py-4 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white font-bold text-base flex items-center gap-3 shadow-2xl transition-all active:scale-95 cursor-pointer btn-interaction ring-4 ring-[#D4A359]/40 animate-pulse-glow"
               >
-                <span>Create My Trip</span>
+                <app-icon name="check-circle" [size]="20" extraClass="text-[#D4A359]"></app-icon>
+                <span>Confirm Trip</span>
                 <app-icon name="arrow-right" [size]="18"></app-icon>
               </button>
 
               <button
                 type="button"
                 (click)="saveTripDraft()"
-                class="px-6 py-3.5 rounded-full border-2 border-[#D4A359] hover:bg-[#D4A359]/20 text-[#071F22] font-bold text-sm flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95"
+                class="px-6 py-4 rounded-full border-2 border-[#D4A359] hover:bg-[#D4A359]/20 text-[#071F22] font-bold text-sm flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 btn-interaction"
               >
                 <app-icon name="bookmark" [size]="16" extraClass="text-[#B88738]"></app-icon>
                 <span>Save as Draft</span>
@@ -569,7 +675,7 @@ interface StepInfo {
               <button
                 type="button"
                 (click)="resetForm()"
-                class="px-5 py-3.5 rounded-full border border-slate-200 hover:bg-slate-100 text-[#6B7280] hover:text-rose-600 font-bold text-sm transition-all cursor-pointer"
+                class="px-5 py-4 rounded-full border border-slate-200 hover:bg-slate-100 text-[#6B7280] hover:text-rose-600 font-bold text-sm transition-all cursor-pointer"
               >
                 Clear Form
               </button>
@@ -584,7 +690,7 @@ interface StepInfo {
               type="button"
               (click)="prevStep()"
               [disabled]="currentStep === 1"
-              class="px-5 py-2.5 rounded-full border border-[#EFEDE7] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              class="px-5 py-2.5 rounded-full border border-[#EFEDE7] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 btn-interaction"
               [ngClass]="currentStep === 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#EFEDE7] text-[#071F22]'"
             >
               <app-icon name="arrow-left" [size]="14"></app-icon>
@@ -608,7 +714,7 @@ interface StepInfo {
             <button
               type="button"
               (click)="saveTripDraft()"
-              class="px-5 py-2.5 rounded-full border border-[#D4A359] text-[#071F22] hover:bg-[#D4A359]/20 text-xs font-bold transition-all cursor-pointer shadow-sm"
+              class="px-5 py-2.5 rounded-full border border-[#D4A359] text-[#071F22] hover:bg-[#D4A359]/20 text-xs font-bold transition-all cursor-pointer shadow-sm btn-interaction"
             >
               Save as Draft
             </button>
@@ -617,18 +723,21 @@ interface StepInfo {
               <button
                 type="button"
                 (click)="nextStep()"
-                class="px-7 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                class="px-7 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95 btn-interaction"
               >
                 <span>Next Step</span>
                 <app-icon name="arrow-right" [size]="14"></app-icon>
               </button>
             } @else {
+              <!-- Step 8: CLEAR CONFIRM TRIP BUTTON -->
               <button
                 type="button"
-                (click)="createMyTrip()"
-                class="px-7 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-md active:scale-95"
+                id="btn-confirm-trip-bottom"
+                (click)="onConfirmTripClick()"
+                class="px-8 py-2.5 rounded-full bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-lg active:scale-95 btn-interaction ring-2 ring-[#D4A359]/40"
               >
-                <span>Create My Trip</span>
+                <app-icon name="check-circle" [size]="16" extraClass="text-[#D4A359]"></app-icon>
+                <span>Confirm Trip</span>
                 <app-icon name="arrow-right" [size]="14"></app-icon>
               </button>
             }
@@ -638,6 +747,134 @@ interface StepInfo {
       </div>
 
     </div>
+
+    <!-- TRIP CONFIRMATION SUCCESS MODAL (Requirement 4 & 9) -->
+    @if (isConfirmationModalOpen && confirmedTrip) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0B1320]/75 backdrop-blur-md animate-modal-backdrop">
+        <div class="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-[#EFEDE7] overflow-hidden animate-confirm-pop p-6 sm:p-8 space-y-6 text-[#17202A]">
+          
+          <!-- Top Celebration Icon Badge with Smooth Animated Stroke -->
+          <div class="flex flex-col items-center text-center space-y-3">
+            <div class="relative">
+              <div class="w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500 flex items-center justify-center text-emerald-600 animate-pulse-glow">
+                <svg class="w-10 h-10 animate-checkmark-draw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <span class="badge-status-confirmed">Trip Confirmed Successfully</span>
+              <h2 class="text-2xl sm:text-3xl font-bold font-display text-[#071F22]">
+                Your Journey is Officially Confirmed!
+              </h2>
+              <p class="text-xs sm:text-sm text-[#6B7280]">
+                All reservations and customized itinerary blueprints have been saved to your workspace.
+              </p>
+            </div>
+
+            <!-- Unique Trip ID Badge with Copy Option (Requirement 4) -->
+            <div class="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#F8F7F3] border border-[#EFEDE7] mt-1">
+              <span class="text-xs text-[#6B7280] font-bold uppercase tracking-wider">Trip ID:</span>
+              <span class="text-sm font-mono font-extrabold text-[#071F22] tracking-wider">{{ confirmedTrip.id }}</span>
+              <button
+                type="button"
+                (click)="copyTripId(confirmedTrip.id)"
+                class="ml-1 text-[#D4A359] hover:text-[#0A2D30] text-xs font-bold transition-colors cursor-pointer"
+                title="Copy Trip ID"
+              >
+                {{ copiedTripId ? 'Copied ✓' : 'Copy' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Trip Overview Card -->
+          <div class="bg-[#F8F7F3] rounded-2xl p-4 sm:p-5 border border-[#EFEDE7] space-y-3 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-[#071F22] text-sm font-display">{{ confirmedTrip.name }}</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-[#0A2D30] text-[#D4A359] text-[10px] font-bold uppercase">
+                {{ confirmedTrip.duration }}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-[#6B7280] pt-2 border-t border-[#EFEDE7]">
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-[#6B7280]">Destination</span>
+                <span class="font-bold text-[#071F22]">{{ confirmedTrip.destination }}, {{ confirmedTrip.country }}</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-[#6B7280]">Dates</span>
+                <span class="font-bold text-[#071F22]">{{ confirmedTrip.startDate }}</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-[#6B7280]">Party</span>
+                <span class="font-bold text-[#071F22]">{{ confirmedTrip.travelers.adults }} Adults • {{ confirmedTrip.rooms }} {{ confirmedTrip.rooms === 1 ? 'Room' : 'Rooms' }}</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-[#6B7280]">Hotel Stay</span>
+                <span class="font-bold text-[#071F22] truncate block">{{ confirmedTrip.hotelName }}</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-[#6B7280]">Air Transit</span>
+                <span class="font-bold text-[#071F22]">{{ confirmedTrip.flight }}</span>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-[#6B7280]">Committed Budget</span>
+                <span class="font-bold text-emerald-700">\${{ confirmedTrip.budget | number }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 WORKING NAVIGATION OPTIONS (Requirement 9) -->
+          <div class="space-y-2 pt-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] block text-center">Where would you like to go next?</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <!-- 1. View My Trip -->
+              <a
+                [routerLink]="['/my-trips', confirmedTrip.id]"
+                (click)="isConfirmationModalOpen = false"
+                class="px-4 py-3 rounded-2xl bg-[#0A2D30] hover:bg-[#D4A359] hover:text-[#071F22] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer btn-interaction"
+              >
+                <app-icon name="map" [size]="15"></app-icon>
+                <span>View My Trip</span>
+              </a>
+
+              <!-- 2. View Itinerary -->
+              <a
+                routerLink="/itinerary"
+                [queryParams]="{ tripId: confirmedTrip.id }"
+                (click)="isConfirmationModalOpen = false"
+                class="px-4 py-3 rounded-2xl bg-[#D4A359] hover:bg-[#c2924a] text-[#071F22] text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer btn-interaction"
+              >
+                <app-icon name="calendar" [size]="15"></app-icon>
+                <span>View Itinerary</span>
+              </a>
+
+              <!-- 3. Go to Dashboard -->
+              <a
+                routerLink="/dashboard"
+                (click)="isConfirmationModalOpen = false"
+                class="px-4 py-3 rounded-2xl bg-[#F8F7F3] hover:bg-[#EFEDE7] text-[#071F22] border border-[#EFEDE7] text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+              >
+                <app-icon name="activity" [size]="15"></app-icon>
+                <span>Go to Dashboard</span>
+              </a>
+
+              <!-- 4. Continue Exploring -->
+              <a
+                routerLink="/packages"
+                (click)="isConfirmationModalOpen = false"
+                class="px-4 py-3 rounded-2xl bg-[#F8F7F3] hover:bg-[#EFEDE7] text-[#071F22] border border-[#EFEDE7] text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+              >
+                <app-icon name="compass" [size]="15"></app-icon>
+                <span>Continue Exploring</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
   `
 })
 export class CreateTripComponent implements OnInit {
@@ -819,12 +1056,136 @@ export class CreateTripComponent implements OnInit {
     }
   }
 
+  additionalPreferencesOptions: string[] = [
+    'Airport VIP Chauffeur',
+    'Vegetarian / Halal Cuisine',
+    'Honeymoon / Anniversary Setup',
+    'Ocean View Suite',
+    'Private English Guide',
+    'Child-Friendly Amenities',
+    'Late Checkout Guaranteed',
+    'Spa & Wellness Credits'
+  ];
+  selectedPreferences: string[] = ['Airport VIP Chauffeur', 'Ocean View Suite'];
+  specialRequests = '';
+
+  isConfirmationModalOpen = false;
+  confirmedTrip: Trip | null = null;
+  copiedTripId = false;
+
+  togglePreference(pref: string): void {
+    if (this.selectedPreferences.includes(pref)) {
+      this.selectedPreferences = this.selectedPreferences.filter(p => p !== pref);
+    } else {
+      this.selectedPreferences.push(pref);
+    }
+  }
+
+  copyTripId(id: string): void {
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText(id);
+      this.copiedTripId = true;
+      this.toastService.show('Trip ID copied to clipboard: ' + id, 'info');
+      setTimeout(() => { this.copiedTripId = false; }, 2500);
+    }
+  }
+
+  getEstimatedTotalBudget(): number {
+    const budgetObj = this.budgetTiers.find(b => b.name === this.selectedBudget);
+    const basePerPerson = budgetObj ? budgetObj.estAmount : 850;
+    let flightAddition = 0;
+    if (this.selectedFlight === 'Economy') flightAddition = 350;
+    if (this.selectedFlight === 'Premium Economy') flightAddition = 680;
+    if (this.selectedFlight === 'Business Class') flightAddition = 1450;
+
+    return (basePerPerson + flightAddition) * (this.adultsCount + (this.kidsCount * 0.6));
+  }
+
+  onConfirmTripClick(): void {
+    // 1. Validation of all required fields (Requirement 4)
+    if (!this.selectedDestination) {
+      this.toastService.show('Please select a destination in Step 1', 'error');
+      this.goToStep(1);
+      return;
+    }
+
+    if (!this.startDate || !this.endDate) {
+      this.toastService.show('Please choose valid travel dates in Step 2', 'error');
+      this.goToStep(2);
+      return;
+    }
+
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) {
+      this.toastService.show('Return date cannot be before departure date', 'error');
+      this.goToStep(2);
+      return;
+    }
+
+    if (this.adultsCount < 1) {
+      this.toastService.show('At least 1 adult traveler is required', 'error');
+      this.goToStep(3);
+      return;
+    }
+
+    if (this.roomsCount < 1) {
+      this.toastService.show('At least 1 room is required', 'error');
+      this.goToStep(3);
+      return;
+    }
+
+    if (!this.selectedHotel) {
+      this.toastService.show('Please select an accommodation in Step 6', 'error');
+      this.goToStep(6);
+      return;
+    }
+
+    // 2. Generate unique Trip ID and confirm trip into LocalStorage
+    const dest = this.selectedDestination.name;
+    const country = this.selectedDestination.country;
+    const user = this.authService.currentUser();
+    const estBudget = Math.round(this.getEstimatedTotalBudget());
+
+    const confirmed = this.tripService.confirmTrip({
+      name: `${dest} Expedition`,
+      destination: dest,
+      country,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      duration: this.getDurationText(),
+      travelers: {
+        adults: this.adultsCount,
+        children: this.kidsCount,
+        total: this.adultsCount + this.kidsCount
+      },
+      rooms: this.roomsCount,
+      budget: estBudget,
+      spent: 0,
+      coverImage: this.selectedDestination.image || 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
+      preferences: [this.selectedStyle, ...this.selectedPreferences],
+      destinationsList: [dest],
+      notes: `Confirmed via TripSphere Plan My Trip Architect. Hotel: ${this.selectedHotel?.name || 'Sanctuary Resort'}, Flight: ${this.selectedFlight}, Rooms: ${this.roomsCount}.${this.specialRequests ? ' Special requests: ' + this.specialRequests : ''}`,
+      userId: user?.id || 'usr-1',
+      userName: user?.fullName || 'Traveler',
+      travelStyle: this.selectedStyle,
+      hotelName: this.selectedHotel?.name,
+      flight: this.selectedFlight,
+      activities: this.selectedActivities,
+      additionalPreferences: this.selectedPreferences.join(', ') + (this.specialRequests ? ` (${this.specialRequests})` : ''),
+      status: 'Confirmed'
+    });
+
+    this.confirmedTrip = confirmed;
+    this.isConfirmationModalOpen = true;
+    this.toastService.show('Trip Confirmed Successfully! Reference: ' + confirmed.id, 'success');
+  }
+
   saveTripDraft() {
     const dest = this.selectedDestination?.name || 'Destination';
     const country = this.selectedDestination?.country || 'Wonderland';
     const user = this.authService.currentUser();
-    const budgetObj = this.budgetTiers.find(b => b.name === this.selectedBudget);
-    const estBudget = budgetObj ? budgetObj.estAmount : 850;
+    const estBudget = Math.round(this.getEstimatedTotalBudget());
 
     this.tripService.createTrip({
       name: `${dest} Draft Plan`,
@@ -832,24 +1193,28 @@ export class CreateTripComponent implements OnInit {
       country,
       startDate: this.startDate,
       endDate: this.endDate,
+      duration: this.getDurationText(),
       travelers: {
         adults: this.adultsCount,
-        children: this.kidsCount
+        children: this.kidsCount,
+        total: this.adultsCount + this.kidsCount
       },
-      status: 'Planned',
+      rooms: this.roomsCount,
+      status: 'Draft',
       budget: estBudget,
       spent: 0,
       coverImage: this.selectedDestination?.image || 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
-      preferences: [this.selectedStyle],
+      preferences: [this.selectedStyle, ...this.selectedPreferences],
       destinationsList: [dest],
       notes: `Draft saved from Step ${this.currentStep}. Flight: ${this.selectedFlight}, Rooms: ${this.roomsCount}.`,
       userId: user?.id || 'usr-1',
       userName: user?.fullName || 'Traveler',
       travelStyle: this.selectedStyle,
       hotelName: this.selectedHotel?.name,
+      flight: this.selectedFlight,
       activities: this.selectedActivities,
-      progress: 30,
-      duration: this.getDurationText()
+      additionalPreferences: this.selectedPreferences.join(', '),
+      progress: 35
     });
 
     this.toastService.show('Trip saved as draft to My Trips!', 'success');
@@ -857,39 +1222,6 @@ export class CreateTripComponent implements OnInit {
   }
 
   createMyTrip() {
-    const dest = this.selectedDestination?.name || 'Goa';
-    const country = this.selectedDestination?.country || 'India';
-    const user = this.authService.currentUser();
-    const budgetObj = this.budgetTiers.find(b => b.name === this.selectedBudget);
-    const estBudget = budgetObj ? budgetObj.estAmount : 850;
-
-    const newTrip = this.tripService.createTrip({
-      name: `${dest} Escape`,
-      destination: dest,
-      country,
-      startDate: this.startDate,
-      endDate: this.endDate,
-      travelers: {
-        adults: this.adultsCount,
-        children: this.kidsCount
-      },
-      status: 'Planned',
-      budget: estBudget,
-      spent: 0,
-      coverImage: this.selectedDestination?.image || 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
-      preferences: [this.selectedStyle],
-      destinationsList: [dest],
-      notes: `Planned via TripSphere 8-Step Architect. ${this.selectedBudget} tier with ${this.selectedHotel?.name || 'Luxury Stay'}. Flight: ${this.selectedFlight}, Rooms: ${this.roomsCount}.`,
-      userId: user?.id || 'usr-1',
-      userName: user?.fullName || 'Labdhi',
-      travelStyle: this.selectedStyle,
-      hotelName: this.selectedHotel?.name,
-      activities: this.selectedActivities,
-      progress: 65,
-      duration: this.getDurationText()
-    });
-
-    this.toastService.show('Trip created successfully! Bon Voyage!', 'success');
-    this.router.navigate(['/my-trips']);
+    this.onConfirmTripClick();
   }
 }
