@@ -112,31 +112,31 @@ interface TravelStory {
           </p>
 
           <!-- Hero Action CTAs (Explore & Plan My Trip) -->
-          <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-2">
+          <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-5 pt-4">
             <a
               routerLink="/destinations"
-              class="px-6 sm:px-7 py-3 rounded-full bg-[#D7A356] hover:bg-[#E5A93C] text-[#111] font-bold text-sm sm:text-[15px] tracking-wide flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 cursor-pointer"
+              class="px-8 py-3.5 rounded-full bg-[#D9A558] hover:bg-[#E4B366] text-[#0A1724] font-bold text-base flex items-center gap-2.5 transition-all duration-300 active:scale-95 cursor-pointer shadow-lg"
             >
-              <app-icon name="compass" [size]="18"></app-icon>
+              <app-icon name="compass" [size]="20"></app-icon>
               <span>Explore Destinations</span>
             </a>
 
             <a
               routerLink="/plan-trip"
-              class="px-6 sm:px-7 py-3 rounded-full bg-black/10 hover:bg-black/20 text-white backdrop-blur-md border border-white/30 font-bold text-sm sm:text-[15px] tracking-wide flex items-center gap-2 transition-all duration-300 active:scale-95 cursor-pointer"
+              class="px-8 py-3.5 rounded-full bg-[#626A66]/40 hover:bg-[#626A66]/60 text-white backdrop-blur-md border border-white/30 font-bold text-base flex items-center gap-2.5 transition-all duration-300 active:scale-95 cursor-pointer"
             >
-              <app-icon name="plus" [size]="18"></app-icon>
+              <app-icon name="plus" [size]="20"></app-icon>
               <span>Plan My Trip</span>
             </a>
 
             <button
               type="button"
               (click)="toggleMute()"
-              class="inline-flex items-center gap-2 px-5 sm:px-6 py-3 rounded-full bg-[#2A2B27]/80 hover:bg-[#2A2B27] backdrop-blur-md text-white font-bold text-sm sm:text-[15px] transition-all duration-200 cursor-pointer"
+              class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#2A2A28]/90 hover:bg-[#2A2A28] text-white font-medium text-base transition-all duration-200 cursor-pointer"
               title="Toggle Audio"
             >
-              <app-icon [name]="isVideoMuted() ? 'volume-x' : 'volume-2'" [size]="18"></app-icon>
-              <span class="hidden sm:inline tracking-wide">{{ isVideoMuted() ? 'Unmute Sound' : 'Mute Sound' }}</span>
+              <app-icon [name]="isVideoMuted() ? 'volume-x' : 'volume-2'" [size]="20"></app-icon>
+              <span class="hidden sm:inline">{{ isVideoMuted() ? 'Unmute Sound' : 'Mute Sound' }}</span>
             </button>
           </div>
 
