@@ -112,10 +112,10 @@ interface TravelStory {
           </p>
 
           <!-- Hero Action CTAs (Explore & Plan My Trip) -->
-          <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-5 pt-4">
+          <div class="flex flex-wrap items-center justify-center pt-4 pb-6">
             <a
               routerLink="/destinations"
-              class="px-8 py-3.5 rounded-full bg-[#D9A558] hover:bg-[#E4B366] text-[#0A1724] font-bold text-base flex items-center gap-2.5 transition-all duration-300 active:scale-95 cursor-pointer shadow-lg"
+              class="m-2 sm:m-3 px-8 py-3.5 rounded-full bg-[#D9A558] hover:bg-[#E4B366] text-[#0A1724] font-bold text-base flex items-center gap-2.5 transition-all duration-300 active:scale-95 cursor-pointer shadow-lg"
             >
               <app-icon name="compass" [size]="20"></app-icon>
               <span>Explore Destinations</span>
@@ -123,7 +123,7 @@ interface TravelStory {
 
             <a
               routerLink="/plan-trip"
-              class="px-8 py-3.5 rounded-full bg-[#626A66]/40 hover:bg-[#626A66]/60 text-white backdrop-blur-md border border-white/30 font-bold text-base flex items-center gap-2.5 transition-all duration-300 active:scale-95 cursor-pointer"
+              class="m-2 sm:m-3 px-8 py-3.5 rounded-full bg-[#626A66]/40 hover:bg-[#626A66]/60 text-white backdrop-blur-md border border-white/30 font-bold text-base flex items-center gap-2.5 transition-all duration-300 active:scale-95 cursor-pointer"
             >
               <app-icon name="plus" [size]="20"></app-icon>
               <span>Plan My Trip</span>
@@ -132,7 +132,7 @@ interface TravelStory {
             <button
               type="button"
               (click)="toggleMute()"
-              class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#2A2A28]/90 hover:bg-[#2A2A28] text-white font-medium text-base transition-all duration-200 cursor-pointer"
+              class="m-2 sm:m-3 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#2A2A28]/90 hover:bg-[#2A2A28] text-white font-medium text-base transition-all duration-200 cursor-pointer"
               title="Toggle Audio"
             >
               <app-icon [name]="isVideoMuted() ? 'volume-x' : 'volume-2'" [size]="20"></app-icon>
