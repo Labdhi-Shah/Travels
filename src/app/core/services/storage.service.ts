@@ -130,8 +130,16 @@ export class StorageService {
     }
 
     // 9. tripsphere_favorites
-    if (!localStorage.getItem(this.PREFIX + 'favorites')) {
-      this.setItem('favorites', ['bali-indonesia', 'kamandalu-ubud', 'goa-sun-and-sand', 'pkg-1']);
+    const existingFavs = localStorage.getItem(this.PREFIX + 'favorites');
+    const favsMigrated = localStorage.getItem(this.PREFIX + 'favorites_migrated');
+    
+    if (!existingFavs) {
+      this.setItem('favorites', []);
+      this.setItem('favorites_migrated', 'true');
+    } else if (!favsMigrated) {
+      // One-time wipe to clear any old mock data from previous versions
+      this.setItem('favorites', []);
+      this.setItem('favorites_migrated', 'true');
     }
 
     // 10. tripsphere_itineraries
