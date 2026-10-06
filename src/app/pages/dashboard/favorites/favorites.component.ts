@@ -130,9 +130,9 @@ type FavTab = 'All' | 'Destinations' | 'Hotels' | 'Packages' | 'Experiences';
       } @else {
         <app-empty-state
           iconName="heart"
-          title="No items saved in {{ activeTab }}"
-          description="Click the heart icon on any destination, hotel, or package to add it to your wishlist."
-          actionLabel="Explore Popular Places"
+          title="No Favorites Yet"
+          description="Start exploring and save your favorite places, hotels, packages, or experiences."
+          actionLabel="Explore Now"
           (action)="explorePopular()"
         ></app-empty-state>
       }

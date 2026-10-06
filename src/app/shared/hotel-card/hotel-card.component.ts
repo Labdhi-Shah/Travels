@@ -42,7 +42,7 @@ import { FavoriteService } from '../../core/services/favorite.service';
               name="heart"
               [size]="14"
               [isFilled]="isFavorite"
-              [extraClass]="isFavorite ? 'text-red-500' : 'text-slate-600'"
+              [extraClass]="isFavorite ? 'text-red-500 scale-110 transition-transform duration-300 drop-shadow-sm' : 'text-slate-600 scale-100 transition-transform duration-300'"
             ></app-icon>
           </button>
         </div>

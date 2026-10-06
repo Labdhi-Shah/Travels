@@ -22,7 +22,7 @@ export class FavoriteService {
   private storage = inject(StorageService);
 
   private favoritesSignal = signal<string[]>(
-    this.storage.getItem<string[]>('favorites', ['bali-indonesia', 'santorini-greece', 'kamandalu-ubud', 'bali-escape-5d'])
+    this.storage.getItem<string[]>('favorites', [])
   );
   readonly favorites = this.favoritesSignal.asReadonly();
   readonly favoriteCount = computed(() => this.favoritesSignal().length);
